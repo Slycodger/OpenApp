@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Dependencies\glad\src\glad.c">
+      <Filter>Dependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\camera3D.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\drawing.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\exceptionHandling.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\material.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mesh.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\program.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shaderHandling.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textures.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\uniqueType.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vector.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visual3D.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{3e44ffab-84d3-4828-96b1-76a8750de518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{b7925a69-6b65-4300-9bd4-d9183f91cb49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\header">
+      <UniqueIdentifier>{a4df158d-8775-44c9-a36b-4aa86de7ebd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{13339082-2c7c-4b47-9cc8-bf086348e6d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{e6e6ea02-3690-4200-b79f-fce60985f61a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\fragment">
+      <UniqueIdentifier>{96890203-9dd2-4a05-891f-05d599e6eff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\vertex">
+      <UniqueIdentifier>{fb843e40-ab28-4f88-af92-ea00b98d1ee6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\project">
+      <UniqueIdentifier>{84dce925-2ab9-43ef-9c79-4fb69aebce31}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\camera3D.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\constants.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\exceptionHandling.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\globals.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mesh.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openglBasics.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\program.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shaderHandling.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\staticList.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textures.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transform3D.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\uniqueType.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vector.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vertex3D.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visual3D.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lines.bat" />
+    <None Include="shaders\basicShader.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\textureShader.frag">
+      <Filter>shaders\fragment</Filter>
+    </None>
+    <None Include="shaders\basicShader.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\viewportShader.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+  </ItemGroup>
+</Project>
