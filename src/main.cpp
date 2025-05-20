@@ -132,7 +132,7 @@ void progStart() {
   visual2->material = Material::getGlobalMaterial("redColor");
 
   visual3->material = &imgMat;
-  visual3->position = Vector3{ 0, 1.0f, -2.f };
+  visual3->position = Vector3{ 0, 4.0f, -2.f };
   //visual3->setParent(visual2);
 
   texCamera->saveRenderBuffer = true;
@@ -144,7 +144,6 @@ void progStart() {
   }
   else {
     Visual3D::addGlobalVisual3D(loaded);
-    loaded->position = Vector3(0, 0, 0);
   }
 
   Visual3D::addGlobalVisual3D(visual1);
@@ -158,6 +157,9 @@ void progUpdate() {
   //visual2->scale += 0.1f * _DELTA_TIME;
   visual3->rotation.y += 30.f * _DELTA_TIME;
   visual3->rotation.x += 15.f * _DELTA_TIME;
+
+  if (_APP_TIME > 2.0f)
+    loaded->rotation.x += 45.f * _DELTA_TIME;
 }
 
 void progEnd() {

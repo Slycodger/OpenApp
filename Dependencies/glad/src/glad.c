@@ -97,9 +97,9 @@ int open_gl(void) {
     static const char *NAMES[] = {"libGL.so.1", "libGL.so"};
 #endif
 
-    unsigned int index = 0;
-    for(index = 0; index < (sizeof(NAMES) / sizeof(NAMES[0])); index++) {
-        libGL = dlopen(NAMES[index], RTLD_NOW | RTLD_GLOBAL);
+    unsigned int visual3DIndex = 0;
+    for(visual3DIndex = 0; visual3DIndex < (sizeof(NAMES) / sizeof(NAMES[0])); visual3DIndex++) {
+        libGL = dlopen(NAMES[visual3DIndex], RTLD_NOW | RTLD_GLOBAL);
 
         if(libGL != NULL) {
 #if defined(__APPLE__) || defined(__HAIKU__)
@@ -176,7 +176,7 @@ static int get_exts(void) {
         exts = (const char *)glGetString(GL_EXTENSIONS);
 #ifdef _GLAD_IS_SOME_NEW_VERSION
     } else {
-        int index;
+        int visual3DIndex;
 
         num_exts_i = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, &num_exts_i);
@@ -188,15 +188,15 @@ static int get_exts(void) {
             return 0;
         }
 
-        for(index = 0; index < num_exts_i; index++) {
-            const char *gl_str_tmp = (const char*)glGetStringi(GL_EXTENSIONS, index);
+        for(visual3DIndex = 0; visual3DIndex < num_exts_i; visual3DIndex++) {
+            const char *gl_str_tmp = (const char*)glGetStringi(GL_EXTENSIONS, visual3DIndex);
             size_t len = strlen(gl_str_tmp);
 
             char *local_str = (char*)malloc((len+1) * sizeof(char));
             if(local_str != NULL) {
                 memcpy(local_str, gl_str_tmp, (len+1) * sizeof(char));
             }
-            exts_i[index] = local_str;
+            exts_i[visual3DIndex] = local_str;
         }
     }
 #endif
@@ -205,9 +205,9 @@ static int get_exts(void) {
 
 static void free_exts(void) {
     if (exts_i != NULL) {
-        int index;
-        for(index = 0; index < num_exts_i; index++) {
-            free((char *)exts_i[index]);
+        int visual3DIndex;
+        for(visual3DIndex = 0; visual3DIndex < num_exts_i; visual3DIndex++) {
+            free((char *)exts_i[visual3DIndex]);
         }
         free((void *)exts_i);
         exts_i = NULL;
@@ -241,12 +241,12 @@ static int has_ext(const char *ext) {
         }
 #ifdef _GLAD_IS_SOME_NEW_VERSION
     } else {
-        int index;
+        int visual3DIndex;
         if(exts_i == NULL) return 0;
-        for(index = 0; index < num_exts_i; index++) {
-            const char *e = exts_i[index];
+        for(visual3DIndex = 0; visual3DIndex < num_exts_i; visual3DIndex++) {
+            const char *e = exts_i[visual3DIndex];
 
-            if(exts_i[index] != NULL && strcmp(e, ext) == 0) {
+            if(exts_i[visual3DIndex] != NULL && strcmp(e, ext) == 0) {
                 return 1;
             }
         }

@@ -7,31 +7,60 @@
 
 namespace openApp {
   class Visual3D : public Transform3D {
-    size_t index;
-    bool selfContained;
+    size_t visual3DIndex;
 
+  protected:
     static Shader visual3DShader;
     static unsigned int materialUBO;
+
+    void visual3DCopyTo(UniqueType* ptr) {}
+    void transform3DCopyTo(UniqueType* ptr) override {
+      Visual3D* vPtr = dynamic_cast<Visual3D*>(ptr);
+      if (!vPtr)
+        return;
+
+      vPtr->srcMaterial = srcMaterial;
+      vPtr->material = material;
+      vPtr->mesh = mesh;
+      vPtr->stencilLayers = stencilLayers;
+
+      visual3DCopyTo(ptr);
+    }
 
   public:
     Material srcMaterial;
     Material* material;
     Mesh* mesh;
-    unsigned int stencilLayers;
+    unsigned char stencilLayers;
 
 
-    virtual void visual3D() {}
+    virtual void visual3DUpdate() {}
+    virtual void visual3DAddedToGlobals() {}
+
+    UniqueType* create() override {
+      return new Visual3D();
+    }
 
     void transform3DUpdate() override {
 
-      visual3D();
+      visual3DUpdate();
     }
 
-    Visual3D(Mesh* mesh, unsigned int StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), index(-1), srcMaterial(), material(0), selfContained(false) {}
-    Visual3D(Mesh* mesh, unsigned int StencilLayer, bool sF) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), index(-1), srcMaterial(), material(0), selfContained(sF) {}
-    ~Visual3D() {
-      if (selfContained && mesh)
-        delete(mesh);
+    void transform3DAddedToGlobals() override {
+
+      visual3DAddedToGlobals();
+    }
+
+    Visual3D() : Transform3D(), mesh(0), stencilLayers(), visual3DIndex(-1), srcMaterial(), material(0) {}
+    Visual3D(Mesh* mesh, unsigned char StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
+    Visual3D(Mesh* mesh, unsigned char StencilLayer, bool sF) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
+    ~Visual3D() override {
+      if (selfContained) {
+        if (mesh)
+          delete(mesh);
+        if (material)
+          delete(material);
+      }
     }
 
 
@@ -45,12 +74,21 @@ namespace openApp {
 
     //--------------------------------------------------
     static bool addGlobalVisual3D(Visual3D* visual) {
-      if (visual->index < (size_t)-1)
+      if (visual->visual3DIndex < (size_t)-1)
         return false;
-      visual->index = globalVisual3DCount;
+      visual->visual3DIndex = globalVisual3DCount;
       globalVisual3DCount++;
       globalVisual3DInstances.addItem(visual);
       UniqueType::addGlobalUniqueType(visual);
+      for (Transform3D** c : visual->children) {
+        if (!c || !*c)
+          continue;
+        Visual3D* ptr = dynamic_cast<Visual3D*>(*c);
+        if (!ptr)
+          continue;
+        addGlobalVisual3D(ptr);
+      }
+
       return true;
     }
 
@@ -58,11 +96,11 @@ namespace openApp {
 
     //--------------------------------------------------
     static bool removeGlobalVisual3D(Visual3D* visual) {
-      size_t i = visual->index;
+      size_t i = visual->visual3DIndex;
       if (i >= (size_t)-1)
         return false;
 
-      visual->index = -1;
+      visual->visual3DIndex = -1;
       globalVisual3DCount--;
       globalVisual3DInstances.removeAt(i);
       return true;
@@ -103,7 +141,7 @@ namespace openApp {
         return;
 
       visual3DShader.active();
-      size_t camCount = Camera3D::getCameraCount();
+      size_t camCount = Camera3D::getGlobalCameraCount();
       unsigned int VAO = Program::getGlobalVAO();
 
       glBindVertexArray(VAO);
@@ -140,7 +178,7 @@ namespace openApp {
     static void drawVisual3DInstances() {
       visual3DShader.active();
       StaticList<Camera3D*>& cams = Camera3D::globalCamera3DInstances;
-      size_t camCount = Camera3D::getCameraCount();
+      size_t camCount = Camera3D::getGlobalCameraCount();
       unsigned int VAO = Program::getGlobalVAO();
 
       glBindVertexArray(VAO);

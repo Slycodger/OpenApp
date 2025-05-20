@@ -97,7 +97,7 @@ namespace openApp {
       bool ref = false;
       size_t index = getOpenArea(1, ref);
       if (!ref) {
-        if (bufferSize > 1)
+        if (bufferSize >= 1)
           resize(bufferSize * 2);
         else
           resize(1);
@@ -106,7 +106,7 @@ namespace openApp {
         if (!ref)
           return -1;
       }
-      if (index > farthest)
+       if (index > farthest)
         farthest = index;
       internal[index] = new T();
       *internal[index] = t;
@@ -169,16 +169,21 @@ namespace openApp {
 
     void resize(size_t newSize) {
       T** newLoc = new T * [newSize];
+
       for (size_t i = 0; i < newSize; i++) {
-        newLoc[i] = internal[i];
+        if (i < bufferSize)
+          newLoc[i] = internal[i];
+        else
+          newLoc[i] = nullptr;
       }
+
       for (size_t i = newSize; i < bufferSize; i++) {
         if (internal[i]) {
           delete(internal[i]);
           _size--;
         }
       }
-
+      bufferSize = newSize;
       delete[](internal);
       internal = newLoc;
     }
