@@ -1,6 +1,8 @@
 #include "visual3D.h"
 #include "camera3D.h"
 #include <iostream>
+#include "textures.h"
+#include "modelLoading.h"
 using namespace openApp;
 
 Camera3D* camera = nullptr;
@@ -23,12 +25,12 @@ Vertex3D triangleVertices[] = {
 //};
 
 Vertex3D squareVertices[] = {
-{{-14.216, 8, 0}, {0, 1}},
-{{-14.216, -8, 0}, {0, 0}},
-{{14.216, -8, 0}, {1, 0}},
-{{14.216, 8, 0}, {1, 1}},
-{{-14.216, 8, 0}, {0, 1}},
-{{14.216, -8, 0}, {1, 0}},
+{{-1, 1, 0}, {0, 1}},
+{{-1, -1, 0}, {0, 0}},
+{{1, -1, 0}, {1, 0}},
+{{1, 1, 0}, {1, 1}},
+{{-1, 1, 0}, {0, 1}},
+{{1, -1, 0}, {1, 0}},
 };
 
 Vertex3D cubeVertices[] = {
@@ -76,10 +78,12 @@ Mesh* squareMesh = nullptr;
 Mesh* cubeMesh = nullptr;
 Visual3D* visual1 = nullptr;
 Visual3D* visual2 = nullptr;
+Visual3D* loaded = nullptr;
 Visual3D* visual3 = nullptr;
 
 Material redColor = Material();
-
+Material imgMat = Material();
+Texture tex;
 
 void progStart() {
   camera = new Camera3D(80, _SCREEN_ASPECT, 0.01f, 90.f, 1, { 0.2, 0.3, 0.3, 1 });
@@ -105,26 +109,45 @@ void progStart() {
   redColor.albedo = { 1, 0, 0, 1 };
   Material::addGlobalMaterial("redColor", &redColor);
 
+
+  int ret = 0;
+  Image* img = image::loadImage("./images/45.png", true, GL_RGBA, 0, ret);
+  img->buffer;
+  if (!ret) {
+    tex = Texture(img, GL_LINEAR, GL_RGBA, GL_UNSIGNED_BYTE);
+    imgMat.albedoTexture = &tex;
+  }
+  else
+    imgMat.albedo = Vector4(1, 1, 1, 1);
+
   visual1 = new Visual3D(squareMesh, 1);
   visual2 = new Visual3D(triangleMesh, 1);
   visual3 = new Visual3D(cubeMesh, 1);
 
 
   visual1->position = Vector3{ -4, 0, -5.f };
-  //visual1->scale = { 8, 4.5f, 1 };
+  visual1->scale = { 4, 2, 1 };
 
   visual2->position = Vector3{ 5.0f, 1.0f, -2.f };
   visual2->material = Material::getGlobalMaterial("redColor");
 
-  visual3->material = Material::getGlobalMaterial("redColor");
+  visual3->material = &imgMat;
   visual3->position = Vector3{ 0, 1.0f, -2.f };
   //visual3->setParent(visual2);
 
   texCamera->saveRenderBuffer = true;
   visual1->srcMaterial.albedoTexture = &texCamera->savedRenderBuffer;
   
-  
-  //visual3D::addGlobalVisual3D(visual1);
+  loaded = modelLoading::loadModel("./models/model.fbx");
+  if (!loaded) {
+    std::cout << "failed to load model\n";
+  }
+  else {
+    Visual3D::addGlobalVisual3D(loaded);
+    loaded->position = Vector3(0, 0, 0);
+  }
+
+  Visual3D::addGlobalVisual3D(visual1);
   Visual3D::addGlobalVisual3D(visual2);
   Visual3D::addGlobalVisual3D(visual3);
 }

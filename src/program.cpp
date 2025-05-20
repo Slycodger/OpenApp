@@ -6,6 +6,8 @@
 #include "program.h"
 #include "visual3D.h"
 #include <chrono>
+#include "images.h"
+#include "modelLoading.h"
 
 void progStart();
 void progUpdate();
@@ -78,7 +80,7 @@ int main() {
   "./shaders/basicShader.frag"
   };
   ShaderPair shaderPair[2] = { ShaderPair{vertShader, 1, GL_VERTEX_SHADER}, ShaderPair(fragShader, 1, GL_FRAGMENT_SHADER) };
-  Shader shader = shader::createShader("basicShader", shaderPair, 2);
+  Shader shader = Shader::createShader("basicShader", shaderPair, 2);
 
 
   const char* textureVertShader[] = {
@@ -88,7 +90,7 @@ int main() {
   "./shaders/textureShader.frag"
   };
   ShaderPair textureShaderPair[2] = { ShaderPair{textureVertShader, 1, GL_VERTEX_SHADER}, ShaderPair(textureFragShader, 1, GL_FRAGMENT_SHADER) };
-  textureShader = shader::createShader("textureShader", textureShaderPair, 2);
+  textureShader = Shader::createShader("textureShader", textureShaderPair, 2);
 
 
   glGenVertexArrays(1, &squareVAO);
@@ -165,6 +167,8 @@ int main() {
   UniqueType::end();
   Mesh::end();
   Material::end();
+  image::end();
+  modelLoading::end();
 }
 
 

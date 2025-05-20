@@ -11,6 +11,7 @@ namespace openApp {
     size_t triCount;
     size_t vertexCount;
     Vertex3D* vertices;
+    bool selfContained;
 
   public:
     unsigned int getVBO() {
@@ -34,12 +35,24 @@ namespace openApp {
     }
 
     Mesh() = delete;
-    Mesh(Vertex3D* verts, size_t vertCount) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3) {
+    Mesh(Vertex3D* verts, size_t vertCount) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3), selfContained(false) {
       glGenBuffers(1, &VBO);
       glBindBuffer(GL_ARRAY_BUFFER, VBO);
       glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex3D), verts, GL_STATIC_DRAW);
 
       glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    Mesh(Vertex3D* verts, size_t vertCount, bool sF) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3), selfContained(sF) {
+      glGenBuffers(1, &VBO);
+      glBindBuffer(GL_ARRAY_BUFFER, VBO);
+      glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex3D), verts, GL_STATIC_DRAW);
+
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    ~Mesh() {
+      if (selfContained && vertices)
+        delete[](vertices);
     }
 
 
@@ -56,6 +69,7 @@ namespace openApp {
       if (globalMeshInstances.contains(name))
         return false;
       globalMeshInstances.insert({ name, mesh });
+      return true;
     }
 
 

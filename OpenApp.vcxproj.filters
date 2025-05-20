@@ -38,6 +38,12 @@
     <ClCompile Include="src\visual3D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
+    <ClCompile Include="src\images.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\modelLoading.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dependencies">
@@ -112,6 +118,12 @@
       <Filter>src\header</Filter>
     </ClInclude>
     <ClInclude Include="src\visual3D.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\images.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\modelLoading.h">
       <Filter>src\header</Filter>
     </ClInclude>
   </ItemGroup>

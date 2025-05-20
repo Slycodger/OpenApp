@@ -8,6 +8,7 @@
 namespace openApp {
   class Visual3D : public Transform3D {
     size_t index;
+    bool selfContained;
 
     static Shader visual3DShader;
     static unsigned int materialUBO;
@@ -26,8 +27,12 @@ namespace openApp {
       visual3D();
     }
 
-    Visual3D(Mesh* mesh, unsigned int StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), index(-1), srcMaterial(), material(0) {}
-
+    Visual3D(Mesh* mesh, unsigned int StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), index(-1), srcMaterial(), material(0), selfContained(false) {}
+    Visual3D(Mesh* mesh, unsigned int StencilLayer, bool sF) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), index(-1), srcMaterial(), material(0), selfContained(sF) {}
+    ~Visual3D() {
+      if (selfContained && mesh)
+        delete(mesh);
+    }
 
 
 
@@ -74,7 +79,7 @@ namespace openApp {
       "./shaders/basicShader.frag"
       };
       ShaderPair shaderPair[2] = { ShaderPair{vertShader, 1, GL_VERTEX_SHADER}, ShaderPair(fragShader, 1, GL_FRAGMENT_SHADER) };
-      visual3DShader = shader::createShader("visual3DShader", shaderPair, 2);
+      visual3DShader = Shader::createShader("visual3DShader", shaderPair, 2);
 
       glCreateBuffers(1, &materialUBO);
       glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
