@@ -7,9 +7,6 @@
 
 namespace openApp {
   class Material {
-    
-
-
   public:
     struct ShaderMaterial {
       Vector4 albedo;

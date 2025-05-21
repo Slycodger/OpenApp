@@ -1,17 +1,13 @@
 #pragma once
 
 namespace openApp {
-  class Program {
-    static unsigned int* globalVAO;
-
-  public:
-    static unsigned int getGlobalVAO() {
-      return *globalVAO;
-    }
-  };
-
   namespace program {
-    void drawSquare();
+    void drawScreenQuad();
     void defaultView();
+
+    unsigned int getShaderMaterialUBO();
+    Shader getShader2D();
+    Shader getShader3D();
+    unsigned int getGlobalVAO();
   }
 }

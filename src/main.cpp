@@ -4,80 +4,15 @@
 #include "texture.h"
 #include "modelLoading.h"
 #include "sound.h"
+#include "visual2D.h"
 using namespace openApp;
 
 Camera3D* camera = nullptr;
 Camera3D* texCamera = nullptr;
 
-Vertex3D triangleVertices[] = {
-  { { -1.f, -1.f, 0.f}, {0.f, 0.f}},
-  { { 1.f, -1.f, 0.f}, {1.f, 0.f}},
-  { { -1.f, 1.f, 0.f}, {0.f, 1.f}}
-};
+Camera2D* cam2D = nullptr;
 
-//Vertex3D squareVertices[] = {
-//  { { -1.f, -1.f, 0.f}, {0.f, 0.f}},
-//  { { 1.f, -1.f, 0.f},  {1.f, 0.f}},
-//  { { -1.f, 1.f, 0.f},  {0.f, 1.f}},
-//
-//  { { 1.f, 1.f, 0.f},   {1.f, 1.f}},
-//  { { -1.f, 1.f, 0.f},  {0.f, 1.f}},
-//  { { 1.f, -1.f, 0.f},  {1.f, 0.f}},
-//};
-
-Vertex3D squareVertices[] = {
-{{-1, 1, 0}, {0, 1}},
-{{-1, -1, 0}, {0, 0}},
-{{1, -1, 0}, {1, 0}},
-{{1, 1, 0}, {1, 1}},
-{{-1, 1, 0}, {0, 1}},
-{{1, -1, 0}, {1, 0}},
-};
-
-Vertex3D cubeVertices[] = {
-{{-1, 1, 1}, {0, 1}},
-{{-1, -1, 1}, {0, 0}},
-{{1, -1, 1}, {1, 0}},
-{{1, 1, 1}, {1, 1}},
-{{-1, 1, 1}, {0, 1}},
-{{1, -1, 1}, {1, 0}},
-{{1, 1, -1.0000001}, {0, 1}},
-{{1, -1, -1.0000001}, {0, 0}},
-{{-1, -1, -0.99999994}, {1, 0}},
-{{-1, 1, -0.99999994}, {1, 1}},
-{{1, 1, -1.0000001}, {0, 1}},
-{{-1, -1, -0.99999994}, {1, 0}},
-{{1, 0.99999994, -1}, {0, 1}},
-{{1, -0.99999994, -1}, {0, 0}},
-{{0.99999994, -0.99999994, 1}, {1, 0}},
-{{0.99999994, 0.99999994, 1}, {1, 1}},
-{{1, 0.99999994, -1}, {0, 1}},
-{{0.99999994, -0.99999994, 1}, {1, 0}},
-{{-0.99999994, 0.99999994, 1}, {0, 1}},
-{{-0.99999994, -0.99999994, 1}, {0, 0}},
-{{-1, -0.99999994, -1}, {1, 0}},
-{{-1, 0.99999994, -1}, {1, 1}},
-{{-0.99999994, 0.99999994, 1}, {0, 1}},
-{{-1, -0.99999994, -1}, {1, 0}},
-{{-0.99999994, 0.99999994, -1}, {0, 1}},
-{{-0.99999994, 1, 1}, {0, 0}},
-{{0.99999994, 1, 1}, {1, 0}},
-{{0.99999994, 0.99999994, -1}, {1, 1}},
-{{-0.99999994, 0.99999994, -1}, {0, 1}},
-{{0.99999994, 1, 1}, {1, 0}},
-{{-0.99999994, -1, 1}, {0, 1}},
-{{-0.99999994, -0.99999994, -1}, {0, 0}},
-{{0.99999994, -0.99999994, -1}, {1, 0}},
-{{0.99999994, -1, 1}, {1, 1}},
-{{-0.99999994, -1, 1}, {0, 1}},
-{{0.99999994, -0.99999994, -1}, {1, 0}},
-};
-
-
-Mesh* triangleMesh = nullptr;
-Mesh* squareMesh = nullptr;
-Mesh* cubeMesh = nullptr;
-Visual3D* visual1 = nullptr;
+Visual2D* visual1 = nullptr;
 Visual3D* visual2 = nullptr;
 Transform3D* loaded = nullptr;
 Visual3D* visual3 = nullptr;
@@ -88,24 +23,20 @@ Texture tex;
 
 void progStart() {
   camera = new Camera3D(80, _SCREEN_ASPECT, 0.01f, 90.f, 1, { 0.2, 0.3, 0.3, 1 });
-  UniqueType::addGlobalUniqueType(camera);
-  Camera3D::setMainCamera(camera);
+  UniqueType::addGlobalUniqueTypeTree(camera);
+  Camera3D::setMainCamera3D(camera);
 
   texCamera = new Camera3D(80, _SCREEN_ASPECT, 0.01f, 90.f, 1, { 0, 0, 0, 0.1 });
-  UniqueType::addGlobalUniqueType(texCamera);
+  UniqueType::addGlobalUniqueTypeTree(texCamera);
+
+  cam2D = new Camera2D(80, _SCREEN_ASPECT, 0.01f, 90.f, 1, {0, 0, 1, 0.1});
+  UniqueType::addGlobalUniqueTypeTree(cam2D);
+  Camera2D::setMainCamera2D(cam2D);
 
   camera->position.z = 4;
   texCamera->position.z = camera->position.z;
   texCamera->setParent(camera);
 
-  triangleMesh = new Mesh(triangleVertices, 3);
-  Mesh::addGlobalMesh("triangle", triangleMesh);
-
-  squareMesh = new Mesh(squareVertices, 6);
-  Mesh::addGlobalMesh("square", squareMesh);
-
-  cubeMesh = new Mesh(cubeVertices, 36);
-  Mesh::addGlobalMesh("cube", cubeMesh);
 
   redColor.albedo = { 1, 0, 0, 1 };
   Material::addGlobalMaterial("redColor", &redColor);
@@ -121,13 +52,13 @@ void progStart() {
   else
     imgMat.albedo = Vector4(1, 1, 1, 1);
 
-  visual1 = new Visual3D(squareMesh, 1);
-  visual2 = new Visual3D(triangleMesh, 1);
-  visual3 = new Visual3D(cubeMesh, 1);
+  visual1 = new Visual2D(Mesh2D::getGlobalMesh2D("square"), 1);
+  visual2 = new Visual3D(Mesh3D::getGlobalMesh3D("triangle"), 1);
+  visual3 = new Visual3D(Mesh3D::getGlobalMesh3D("cube"), 1);
 
 
-  visual1->position = Vector3{ -4, 0, -5.f };
-  visual1->scale = { 4, 2, 1 };
+  visual1->position = Vector2{ 0, 0 };
+  visual1->scale = { 4, 2 };
 
   visual2->position = Vector3{ 5.0f, 1.0f, -2.f };
   visual2->material = Material::getGlobalMaterial("redColor");
@@ -136,20 +67,20 @@ void progStart() {
   visual3->position = Vector3{ 0, 4.0f, -2.f };
   //visual3->setParent(visual2);
 
-  texCamera->saveRenderBuffer = true;
-  visual1->srcMaterial.albedoTexture = &texCamera->savedRenderBuffer;
+  texCamera->renderBufferSaving(true);
+  //visual1->srcMaterial.albedoTexture = &texCamera->savedRenderBuffer;
   
   loaded = dynamic_cast<Transform3D*>(modelLoading::loadModel("./models/model.fbx"));
   if (!loaded) {
     std::cout << "failed to load model\n";
   }
   else {
-    Visual3D::addTreeToGlobalVisual3D(loaded);
+    Visual3D::addGlobalVisual3DTree(loaded);
   }
 
-  Visual3D::addTreeToGlobalVisual3D(visual1);
-  Visual3D::addTreeToGlobalVisual3D(visual2);
-  Visual3D::addTreeToGlobalVisual3D(visual3);
+  Visual2D::addGlobalVisual2DTree(visual1);
+  Visual3D::addGlobalVisual3DTree(visual2);
+  Visual3D::addGlobalVisual3DTree(visual3);
 }
 
 bool doom = false;
@@ -164,7 +95,7 @@ void progUpdate() {
 
   if (_APP_TIME > 2.0f) {
     loaded->rotation.x += 45.f * _DELTA_TIME;
-    if (dings < 1000) {
+    if (dings < 250) {
       sound::queueSound("./sounds/ding.wav");
       dings++;
     }
@@ -181,7 +112,4 @@ void progEnd() {
   delete(visual1);
   delete(visual2);
   delete(visual3);
-  delete(triangleMesh);
-  delete(squareMesh);
-  delete(cubeMesh);
 }

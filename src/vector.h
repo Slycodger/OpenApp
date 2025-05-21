@@ -6,6 +6,46 @@ namespace openApp {
     float x;
     float y;
 
+    Vector2 operator - (const Vector2& vec) const {
+      Vector2 t = *this;
+      t.x -= vec.x;
+      t.y -= vec.y;
+      return t;
+    }
+    Vector2 operator + (const Vector2& vec) const {
+      Vector2 t = *this;
+      t.x += vec.x;
+      t.y += vec.y;
+      return t;
+    }
+    Vector2 operator / (const Vector2& vec) const {
+      Vector2 t = *this;
+      t.x /= vec.x;
+      t.y /= vec.y;
+      return t;
+    }
+    Vector2 operator * (const Vector2& vec) const {
+      Vector2 t = *this;
+      t.x *= vec.x;
+      t.y *= vec.y;
+      return t;
+    }
+
+    Vector2& operator += (const Vector2& vec) {
+      x += vec.x;
+      y += vec.y;
+      return *this;
+    }
+    Vector2& operator += (const float val) {
+      x += val;
+      y += val;
+      return *this;
+    }
+    Vector2& operator *= (const float val) {
+      x *= val;
+      y *= val;
+      return *this;
+    }
 
     Vector2() : x(0), y(0) {}
     Vector2(float t) : x(t), y(t) {}

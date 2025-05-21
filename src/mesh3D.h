@@ -6,7 +6,7 @@
 #include <map>
 
 namespace openApp {
-  class Mesh {
+  class Mesh3D {
     unsigned int VBO;
     size_t triCount;
     size_t vertexCount;
@@ -34,15 +34,15 @@ namespace openApp {
       return vertices[pos];
     }
 
-    Mesh() = delete;
-    Mesh(Vertex3D* verts, size_t vertCount) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3), selfContained(false) {
+    Mesh3D() = delete;
+    Mesh3D(Vertex3D* verts, size_t vertCount) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3), selfContained(false) {
       glGenBuffers(1, &VBO);
       glBindBuffer(GL_ARRAY_BUFFER, VBO);
       glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex3D), verts, GL_STATIC_DRAW);
 
       glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    Mesh(Vertex3D* verts, size_t vertCount, bool sF) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3), selfContained(sF) {
+    Mesh3D(Vertex3D* verts, size_t vertCount, bool sF) : vertices(verts), vertexCount(vertCount), triCount(vertCount / 3), selfContained(sF) {
       glGenBuffers(1, &VBO);
       glBindBuffer(GL_ARRAY_BUFFER, VBO);
       glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex3D), verts, GL_STATIC_DRAW);
@@ -50,7 +50,7 @@ namespace openApp {
       glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    ~Mesh() {
+    ~Mesh3D() {
       if (selfContained && vertices)
         delete[](vertices);
     }
@@ -60,35 +60,35 @@ namespace openApp {
 
     //Static stuff
     //--------------------------------------------------
-    static std::map<std::string, Mesh*> globalMeshInstances;
+    static std::map<std::string, Mesh3D*> globalMesh3DInstances;
 
 
 
     //--------------------------------------------------
-    static bool addGlobalMesh(std::string name, Mesh* mesh) {
-      if (globalMeshInstances.contains(name))
+    static bool addGlobalMesh3D(std::string name, Mesh3D* mesh) {
+      if (globalMesh3DInstances.contains(name))
         return false;
-      globalMeshInstances.insert({ name, mesh });
+      globalMesh3DInstances.insert({ name, mesh });
       return true;
     }
 
 
 
     //--------------------------------------------------
-    static Mesh* getGlobalMesh(std::string name) {
-      if (!globalMeshInstances.contains(name))
+    static Mesh3D* getGlobalMesh3D(std::string name) {
+      if (!globalMesh3DInstances.contains(name))
         return 0;
 
-      return globalMeshInstances[name];
+      return globalMesh3DInstances[name];
     }
 
 
 
     //--------------------------------------------------
-    static bool removeGlobalMesh(std::string name) {
-      if (!globalMeshInstances.contains(name))
+    static bool removeGlobalMesh3D(std::string name) {
+      if (!globalMesh3DInstances.contains(name))
         return false;
-      globalMeshInstances.erase(name);
+      globalMesh3DInstances.erase(name);
       return true;
     }
 
@@ -96,7 +96,7 @@ namespace openApp {
 
     //--------------------------------------------------
     static void end() {
-      Mesh::globalMeshInstances.clear();
+      Mesh3D::globalMesh3DInstances.clear();
     }
   };
 }

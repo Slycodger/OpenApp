@@ -13,6 +13,8 @@ namespace openApp {
     virtual void transform3DUpdate() {}
     virtual void transform3DAddedToGlobals() {}
     virtual void transform3DSetParent(UniqueType* ptr) {}
+    virtual void transform3DAddedChild(UniqueType* ptr) {}
+    virtual void transform3DRemovingChild(size_t index) {}
 
     void uniqueTypeSetParent(UniqueType* ptr) override {
       Transform3D* tPtr = dynamic_cast<Transform3D*>(ptr);
@@ -30,6 +32,15 @@ namespace openApp {
       relativeRotation = rotation - tPtr->rotation;
 
       transform3DSetParent(ptr);
+    }
+
+    void uniqueTypeAddedChild(UniqueType* ptr) override {
+
+      transform3DAddedChild(ptr);
+    }
+    void uniqueTypeRemovingChild(size_t index) override {
+
+      transform3DRemovingChild(index);
     }
 
     void uniqueTypeUpdate() override {

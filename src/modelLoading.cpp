@@ -13,7 +13,7 @@ std::map<std::string, UniqueType*> modelsLoaded = std::map<std::string, UniqueTy
 namespace openApp {
   namespace modelLoading {
 
-    Mesh* handleMesh(const aiMesh* loadedMesh) {
+    Mesh3D* handleMesh(const aiMesh* loadedMesh) {
       if (!loadedMesh)
         return nullptr;
 
@@ -30,7 +30,7 @@ namespace openApp {
       }
       delete[](sharedVerts);
 
-      Mesh* mesh = new Mesh(verts, loadedMesh->mNumFaces * 3, true);
+      Mesh3D* mesh = new Mesh3D(verts, loadedMesh->mNumFaces * 3, true);
       return mesh;
     }
 

@@ -71,12 +71,12 @@ namespace openApp {
 
 
     StaticListIterator begin() {
-      if (!internal)
+      if (!internal || _size == 0)
         return StaticListIterator(nullptr, nullptr);
       return StaticListIterator(internal, internal + farthest + 1);
     }
     StaticListIterator end() {
-      if (!internal)
+      if (!internal || _size == 0)
         return StaticListIterator(nullptr, nullptr);
       return StaticListIterator(internal + farthest + 1, internal + farthest + 1);
     }

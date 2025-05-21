@@ -4,7 +4,6 @@
     <ClCompile Include="Dependencies\glad\src\glad.c">
       <Filter>Dependencies</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\camera3D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
@@ -14,16 +13,25 @@
     <ClCompile Include="src\exceptionHandling.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
+    <ClCompile Include="src\image.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
     <ClCompile Include="src\material.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
-    <ClCompile Include="src\mesh.cpp">
+    <ClCompile Include="src\mesh3D.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\modelLoading.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
     <ClCompile Include="src\program.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
     <ClCompile Include="src\shaderHandling.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sound.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
     <ClCompile Include="src\texture.cpp">
@@ -38,13 +46,14 @@
     <ClCompile Include="src\visual3D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
-    <ClCompile Include="src\image.cpp">
+    <ClCompile Include="src\mesh2D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
-    <ClCompile Include="src\modelLoading.cpp">
+    <ClCompile Include="src\visual2D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
-    <ClCompile Include="src\sound.cpp">
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\camera2D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,96 +64,123 @@
     <Filter Include="src">
       <UniqueIdentifier>{b7925a69-6b65-4300-9bd4-d9183f91cb49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\header">
-      <UniqueIdentifier>{a4df158d-8775-44c9-a36b-4aa86de7ebd4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{13339082-2c7c-4b47-9cc8-bf086348e6d9}</UniqueIdentifier>
     </Filter>
     <Filter Include="shaders">
-      <UniqueIdentifier>{e6e6ea02-3690-4200-b79f-fce60985f61a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\fragment">
-      <UniqueIdentifier>{96890203-9dd2-4a05-891f-05d599e6eff9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="shaders\vertex">
-      <UniqueIdentifier>{fb843e40-ab28-4f88-af92-ea00b98d1ee6}</UniqueIdentifier>
+      <UniqueIdentifier>{ad74c3d2-db2f-45d2-b603-d9c94acd5b5f}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\project">
-      <UniqueIdentifier>{84dce925-2ab9-43ef-9c79-4fb69aebce31}</UniqueIdentifier>
+      <UniqueIdentifier>{4dbd6c07-3eac-4002-bec0-dfb1c28e41e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\include">
+      <UniqueIdentifier>{cbc08a33-3c66-4767-b983-74c9e183c76f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\vertex">
+      <UniqueIdentifier>{7a097d16-d1d5-4bc6-8973-1f5f29c3f5f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\fragment">
+      <UniqueIdentifier>{75379a3e-277b-4d59-96d2-f9ff77cb29c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders\functional">
+      <UniqueIdentifier>{9eccff39-9829-46ce-9a05-6fa1802bbcc0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\camera3D.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\constants.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\exceptionHandling.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\globals.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\material.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mesh.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\openglBasics.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\program.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\shaderHandling.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\staticList.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\texture.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\transform3D.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\uniqueType.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vector.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vertex3D.h">
-      <Filter>src\header</Filter>
-    </ClInclude>
-    <ClInclude Include="src\visual3D.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\image.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mesh3D.h">
+      <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\modelLoading.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\openglBasics.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\program.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\shaderHandling.h">
+      <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\sound.h">
-      <Filter>src\header</Filter>
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\staticList.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\texture.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transform3D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\uniqueType.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vector.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vertex3D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visual3D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mesh2D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transform2D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visual2D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cameraViewer.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\camera2D.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vertex2D.h">
+      <Filter>src\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lines.bat" />
+    <None Include="shaders\basic3DShader.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\viewportShader.vert">
+      <Filter>shaders\vertex</Filter>
+    </None>
     <None Include="shaders\basicShader.frag">
       <Filter>shaders\fragment</Filter>
     </None>
     <None Include="shaders\textureShader.frag">
       <Filter>shaders\fragment</Filter>
     </None>
-    <None Include="shaders\basicShader.vert">
-      <Filter>shaders\vertex</Filter>
+    <None Include="shaders\common.glsl">
+      <Filter>shaders\functional</Filter>
     </None>
-    <None Include="shaders\viewportShader.vert">
+    <None Include="shaders\basic2DShader.vert">
       <Filter>shaders\vertex</Filter>
     </None>
   </ItemGroup>

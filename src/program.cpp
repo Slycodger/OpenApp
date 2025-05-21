@@ -3,8 +3,10 @@
 #include "exceptionHandling.h"
 #include "vector.h"
 #include "camera3D.h"
+#include "camera2D.h"
 #include "program.h"
 #include "visual3D.h"
+#include "visual2D.h"
 #include <chrono>
 #include "image.h"
 #include "modelLoading.h"
@@ -42,10 +44,111 @@ double _DELTA_TIME = 0;
 double _APP_TIME = 0;
 
 unsigned int VAO = 0;
-unsigned int* Program::globalVAO = &VAO;
+unsigned int shaderMaterialUBO = 0;
 
 Shader textureShader;
+Shader shader2D;
+Shader shader3D;
 
+
+Mesh3D* triangleMesh3D = nullptr;
+Mesh3D* squareMesh3D = nullptr;
+Mesh3D* cubeMesh3D = nullptr;
+
+Mesh2D* triangleMesh2D = nullptr;
+Mesh2D* squareMesh2D = nullptr;
+
+
+Vertex3D triangleVertices3D[] = {
+  { { -1.f, -1.f, 0.f}, {0.f, 0.f}},
+  { { 1.f, -1.f, 0.f}, {1.f, 0.f}},
+  { { -1.f, 1.f, 0.f}, {0.f, 1.f}}
+};
+
+Vertex3D squareVertices3D[] = {
+{{-1, 1, 0}, {0, 1}},
+{{-1, -1, 0}, {0, 0}},
+{{1, -1, 0}, {1, 0}},
+{{1, 1, 0}, {1, 1}},
+{{-1, 1, 0}, {0, 1}},
+{{1, -1, 0}, {1, 0}},
+};
+
+Vertex3D cubeVertices3D[] = {
+{{-1, 1, 1}, {0, 1}},
+{{-1, -1, 1}, {0, 0}},
+{{1, -1, 1}, {1, 0}},
+{{1, 1, 1}, {1, 1}},
+{{-1, 1, 1}, {0, 1}},
+{{1, -1, 1}, {1, 0}},
+{{1, 1, -1}, {0, 1}},
+{{1, -1, -1}, {0, 0}},
+{{-1, -1, -1}, {1, 0}},
+{{-1, 1, -1}, {1, 1}},
+{{1, 1, -1}, {0, 1}},
+{{-1, -1, -1}, {1, 0}},
+{{1, 1, 1}, {0, 1}},
+{{1, -1, 1}, {0, 0}},
+{{1, -1, -1}, {1, 0}},
+{{1, 1, -1}, {1, 1}},
+{{1, 1, 1}, {0, 1}},
+{{1, -1, -1}, {1, 0}},
+{{-1, 1, -1}, {0, 1}},
+{{-1, -1, -1}, {0, 0}},
+{{-1, -1, 1}, {1, 0}},
+{{-1, 1, 1}, {1, 1}},
+{{-1, 1, -1}, {0, 1}},
+{{-1, -1, 1}, {1, 0}},
+{{-1, 1, -1}, {0, 1}},
+{{-1, 1, 1}, {0, 0}},
+{{1, 1, 1}, {1, 0}},
+{{1, 1, -1}, {1, 1}},
+{{-1, 1, -1}, {0, 1}},
+{{1, 1, 1}, {1, 0}},
+{{-1, -1, 1}, {0, 1}},
+{{-1, -1, -1}, {0, 0}},
+{{1, -1, -1}, {1, 0}},
+{{1, -1, 1}, {1, 1}},
+{{-1, -1, 1}, {0, 1}},
+{{1, -1, -1}, {1, 0}},
+};
+
+
+
+Vertex2D triangleVertices2D[] = {
+  { { -1.f, -1.f }, {0.f, 0.f}},
+  { { 1.f, -1.f }, {1.f, 0.f}},
+  { { -1.f, 1.f }, {0.f, 1.f}}
+};
+
+Vertex2D squareVertices2D[] = {
+{{-1, 1}, {0, 1}},
+{{-1, -1}, {0, 0}},
+{{1, -1}, {1, 0}},
+{{1, 1}, {1, 1}},
+{{-1, 1}, {0, 1}},
+{{1, -1}, {1, 0}},
+};
+
+
+namespace openApp {
+  namespace program {
+
+    unsigned int getShaderMaterialUBO() {
+      return shaderMaterialUBO;
+    }
+    Shader getShader2D() {
+      return shader2D;
+    }
+    Shader getShader3D() {
+      return shader3D;
+    }
+    unsigned int getGlobalVAO() {
+      return VAO;
+    }
+
+  }
+}
 
 int main() {
   exceptionsStart();
@@ -67,22 +170,10 @@ int main() {
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_STENCIL_TEST);
-  //glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-
-  Visual3D::start();
-
-  const char* vertShader[] = {
-    "./shaders/basicShader.vert"
-  };
-  const char* fragShader[] = {
-  "./shaders/basicShader.frag"
-  };
-  ShaderPair shaderPair[2] = { ShaderPair{vertShader, 1, GL_VERTEX_SHADER}, ShaderPair(fragShader, 1, GL_FRAGMENT_SHADER) };
-  Shader shader = Shader::createShader("basicShader", shaderPair, 2);
-
 
   const char* textureVertShader[] = {
   "./shaders/viewportShader.vert",
@@ -92,6 +183,35 @@ int main() {
   };
   ShaderPair textureShaderPair[2] = { ShaderPair{textureVertShader, 1, GL_VERTEX_SHADER}, ShaderPair(textureFragShader, 1, GL_FRAGMENT_SHADER) };
   textureShader = Shader::createShader("textureShader", textureShaderPair, 2);
+
+
+  const char* vertShader2D[] = {
+"./shaders/basic2DShader.vert"
+  };
+  const char* fragShader2D[] = {
+  "./shaders/basicShader.frag"
+  };
+  ShaderPair shaderPair2D[2] = {ShaderPair{vertShader2D, 1, GL_VERTEX_SHADER}, ShaderPair(fragShader2D, 1, GL_FRAGMENT_SHADER)};
+  shader2D = Shader::createShader("visual2DShader", shaderPair2D, 2);
+
+
+  const char* vertShader3D[] = {
+"./shaders/basic3DShader.vert"
+  };
+  const char* fragShader3D[] = {
+  "./shaders/basicShader.frag"
+  };
+  ShaderPair shaderPair3D[2] = {ShaderPair{vertShader3D, 1, GL_VERTEX_SHADER}, ShaderPair(fragShader3D, 1, GL_FRAGMENT_SHADER)};
+  shader3D = Shader::createShader("visual3DShader", shaderPair3D, 2);
+
+
+  glCreateBuffers(1, &shaderMaterialUBO);
+  glBindBuffer(GL_UNIFORM_BUFFER, shaderMaterialUBO);
+  glBufferData(GL_UNIFORM_BUFFER, sizeof(Material::ShaderMaterial), 0, GL_DYNAMIC_DRAW);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 0, shaderMaterialUBO);
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+
 
 
   glGenVertexArrays(1, &squareVAO);
@@ -128,6 +248,25 @@ int main() {
   glBindVertexArray(0);
 
 
+
+  triangleMesh3D = new Mesh3D(triangleVertices3D, 3);
+  Mesh3D::addGlobalMesh3D("triangle", triangleMesh3D);
+
+  squareMesh3D = new Mesh3D(squareVertices3D, 6);
+  Mesh3D::addGlobalMesh3D("square", squareMesh3D);
+
+  cubeMesh3D = new Mesh3D(cubeVertices3D, 36);
+  Mesh3D::addGlobalMesh3D("cube", cubeMesh3D);
+
+
+  triangleMesh2D = new Mesh2D(triangleVertices2D, 3);
+  Mesh2D::addGlobalMesh2D("triangle", triangleMesh2D);
+
+  squareMesh2D = new Mesh2D(squareVertices2D, 6);
+  Mesh2D::addGlobalMesh2D("square", squareMesh2D);
+
+
+
   sound::start();
   progStart();
 
@@ -140,25 +279,37 @@ int main() {
 
     UniqueType::updateUniqueTypeInstances();
     Visual3D::drawVisual3DInstances();
+    Visual2D::drawVisual2DInstances();
     sound::update();
     progUpdate();
 
     defaultView();
     glClearColor(0.3, 0.3, 0.3, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glDepthMask(GL_FALSE);
 
+    textureShader.active();
+    Camera3D* mainCam3D = Camera3D::getMainCamera3D();
+    if (mainCam3D) {
 
-    Camera3D* mainCam = Camera3D::getMainCamera();
-    if (mainCam) {
-      textureShader.active();
-
-      glBindTexture(GL_TEXTURE_2D, Camera3D::getMainCamera()->renderBuffer);
+      glBindTexture(GL_TEXTURE_2D, mainCam3D->renderBuffer);
       glActiveTexture(GL_TEXTURE0);
 
       glUniform1i(glGetUniformLocation(textureShader, "texTarget"), 0);
-      drawSquare();
+      drawScreenQuad();
     }
 
+    Camera2D* mainCam2D = Camera2D::getMainCamera2D();
+    if (mainCam2D) {
+
+      glBindTexture(GL_TEXTURE_2D, mainCam2D->renderBuffer);
+      glActiveTexture(GL_TEXTURE0);
+
+      glUniform1i(glGetUniformLocation(textureShader, "texTarget"), 0);
+      drawScreenQuad();
+    }
+
+    glDepthMask(GL_TRUE);
 
     glfwSwapBuffers(window);
 
@@ -167,19 +318,27 @@ int main() {
 
   progEnd();
   Visual3D::end();
+  Visual2D::end();
   UniqueType::end();
-  Mesh::end();
+  Mesh3D::end();
+  Mesh2D::end();
   Material::end();
   image::end();
   modelLoading::end();
   sound::end();
+
+  delete(triangleMesh3D);
+  delete(squareMesh3D);
+  delete(cubeMesh3D);
+  delete(triangleMesh2D);
+  delete(squareMesh2D);
 }
 
 
 
 namespace openApp {
   namespace program {
-    void drawSquare() {
+    void drawScreenQuad() {
       textureShader.active();
       glBindVertexArray(squareVAO);
       glDrawArrays(GL_TRIANGLES, 0, 6);

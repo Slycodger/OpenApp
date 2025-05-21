@@ -54,6 +54,13 @@ namespace openApp {
       return globalShaders[loc];
     }
 
+    static bool fileExists(const char* f) {
+      struct _stat buffer;
+      if (_stat(f, &buffer) == 0)
+        return true;
+      return false;
+    }
+
     static unsigned int createShader(std::string name, ShaderPair* pairs, size_t shaderCount) {
       if (globalShaders.contains(name))
         return globalShaders[name];
@@ -64,7 +71,7 @@ namespace openApp {
         if (!pairs[i].shaderCount || !pairs[i].shaders)
           return 0;
         else for (size_t j = 0; j < pairs[i].shaderCount; j++)
-          if (!pairs[i].shaders[j])
+          if (!pairs[i].shaders[j] || !fileExists(pairs[i].shaders[j]))
             return 0;
 
 

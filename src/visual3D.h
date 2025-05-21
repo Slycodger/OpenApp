@@ -1,6 +1,6 @@
 #pragma once
 #include "transform3D.h"
-#include "mesh.h"
+#include "mesh3D.h"
 #include "camera3D.h"
 #include "program.h"
 #include "material.h"
@@ -10,11 +10,11 @@ namespace openApp {
     size_t visual3DIndex;
 
   protected:
-    static Shader visual3DShader;
-    static unsigned int materialUBO;
     virtual void visual3DUpdate() {}
     virtual void visual3DAddedToGlobals() {}
     virtual void visual3DSetParent(UniqueType* ptr) {}
+    virtual void visual3DAddedChild(UniqueType* ptr) {}
+    virtual void visual3DRemovingChild(size_t index) {}
 
     void visual3DCopyTo(UniqueType* ptr) {}
     void transform3DCopyTo(UniqueType* ptr) override {
@@ -44,11 +44,19 @@ namespace openApp {
 
       visual3DSetParent(ptr);
     }
+    void transform3DAddedChild(UniqueType* ptr) override {
+
+      visual3DAddedChild(ptr);
+    }
+    void transform3DRemovingChild(size_t index) override {
+
+      visual3DRemovingChild(index);
+    }
 
   public:
     Material srcMaterial;
     Material* material;
-    Mesh* mesh;
+    Mesh3D* mesh;
     unsigned char stencilLayers;
 
 
@@ -57,8 +65,8 @@ namespace openApp {
     }
 
     Visual3D() : Transform3D(), mesh(0), stencilLayers(), visual3DIndex(-1), srcMaterial(), material(0) {}
-    Visual3D(Mesh* mesh, unsigned char StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
-    Visual3D(Mesh* mesh, unsigned char StencilLayer, bool sF) : Transform3D(sF), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
+    Visual3D(Mesh3D* mesh, unsigned char StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
+    Visual3D(Mesh3D* mesh, unsigned char StencilLayer, bool sF) : Transform3D(sF), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
     ~Visual3D() override {
       if (selfContained) {
         if (mesh)
@@ -78,14 +86,15 @@ namespace openApp {
 
 
     //--------------------------------------------------
-    static void addTreeToGlobalVisual3D(UniqueType* ptr) {
+    static void addGlobalVisual3DTree(UniqueType* ptr) {
       for (UniqueType** c : ptr->children) {
         if (!c || !*c)
           continue;
-        addTreeToGlobalVisual3D(*c);
+        addGlobalVisual3DTree(*c);
       }
 
 
+      UniqueType::addGlobalUniqueTypeTree(ptr);
       Visual3D* visual = dynamic_cast<Visual3D*>(ptr);
       if (!visual)
         return;
@@ -95,7 +104,6 @@ namespace openApp {
       visual->visual3DIndex = globalVisual3DCount;
       globalVisual3DCount++;
       globalVisual3DInstances.addItem(visual);
-      UniqueType::addGlobalUniqueType(visual);
     }
 
 
@@ -115,26 +123,6 @@ namespace openApp {
 
 
     //--------------------------------------------------
-    static void start() {
-      const char* vertShader[] = {
-    "./shaders/basicShader.vert"
-      };
-      const char* fragShader[] = {
-      "./shaders/basicShader.frag"
-      };
-      ShaderPair shaderPair[2] = { ShaderPair{vertShader, 1, GL_VERTEX_SHADER}, ShaderPair(fragShader, 1, GL_FRAGMENT_SHADER) };
-      visual3DShader = Shader::createShader("visual3DShader", shaderPair, 2);
-
-      glCreateBuffers(1, &materialUBO);
-      glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
-      glBufferData(GL_UNIFORM_BUFFER, sizeof(Material::ShaderMaterial), 0, GL_DYNAMIC_DRAW);
-      glBindBufferBase(GL_UNIFORM_BUFFER, 0, materialUBO);
-      glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    }
-
-
-
-    //--------------------------------------------------
     static void end() {
       Visual3D::globalVisual3DInstances.clear();
     }
@@ -146,12 +134,12 @@ namespace openApp {
       if (!visual || !visual->mesh)
         return;
 
-      visual3DShader.active();
-      size_t camCount = Camera3D::getGlobalCameraCount();
-      unsigned int VAO = Program::getGlobalVAO();
+      program::getShader3D().active();
+      size_t camCount = Camera3D::getGlobalCamera3DCount();
+      unsigned int VAO = program::getGlobalVAO();
 
       glBindVertexArray(VAO);
-      glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
+      glBindBuffer(GL_UNIFORM_BUFFER, program::getShaderMaterialUBO());
 
       Shader::setMat4("transform", visual->getTransformMatrix());
 
@@ -182,20 +170,20 @@ namespace openApp {
 
     //--------------------------------------------------
     static void drawVisual3DInstances() {
-      visual3DShader.active();
+      program::getShader3D().active();
       StaticList<Camera3D*>& cams = Camera3D::globalCamera3DInstances;
-      size_t camCount = Camera3D::getGlobalCameraCount();
-      unsigned int VAO = Program::getGlobalVAO();
+      size_t camCount = Camera3D::getGlobalCamera3DCount();
+      unsigned int VAO = program::getGlobalVAO();
 
       glBindVertexArray(VAO);
-      glBindBuffer(GL_UNIFORM_BUFFER, materialUBO);
+      glBindBuffer(GL_UNIFORM_BUFFER, program::getShaderMaterialUBO());
 
 
       for (Visual3D** vP : Visual3D::globalVisual3DInstances) {
         Visual3D* visual = *vP;
         if (!visual->mesh)
           continue;
-        visual3DShader.setMat4("transform", visual->getTransformMatrix());
+        Shader::setMat4("transform", visual->getTransformMatrix());
 
         if (visual->material)
           visual->material->applyToShader();
@@ -210,8 +198,8 @@ namespace openApp {
 
         for (auto cam : cams) {
           (*cam)->active();
-          visual3DShader.setMat4("projection", (*cam)->getProjection());
-          visual3DShader.setMat4("view", (*cam)->getTransformMatrix());
+          Shader::setMat4("projection", (*cam)->getProjection());
+          Shader::setMat4("view", (*cam)->getTransformMatrix());
 
           glDrawArrays(GL_TRIANGLES, 0, vertexCount);
         }

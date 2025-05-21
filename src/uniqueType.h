@@ -11,6 +11,9 @@ namespace openApp {
     virtual void uniqueTypeUpdate() {}
     virtual void uniqueTypeAddedToGlobals() {}
     virtual void uniqueTypeSetParent(UniqueType* ptr) {}
+    virtual void uniqueTypeAddedChild(UniqueType* ptr) {}
+    virtual void uniqueTypeRemovingChild(size_t index) {}
+
 
 
     size_t childIndex;
@@ -50,6 +53,7 @@ namespace openApp {
     void removeParent() {
       if (!parent)
         return;
+      parent->uniqueTypeRemovingChild(childIndex);
       parent->children.removeAt(childIndex);
       childIndex = -1;
       parent = nullptr;
@@ -63,6 +67,8 @@ namespace openApp {
       if (c->childIndex >= (size_t)-1)
         return;
       c->parent = this;
+      c->uniqueTypeSetParent(this);
+      uniqueTypeAddedChild(c);
     }
 
     void removeChild(size_t& visual3DIndex) {
@@ -102,7 +108,7 @@ namespace openApp {
 
 
     //--------------------------------------------------
-    static bool addGlobalUniqueType(UniqueType* unique) {
+    static bool addGlobalUniqueTypeTree(UniqueType* unique) {
       if (unique->uniqueTypeIndex < (size_t)-1)
         return false;
       unique->uniqueTypeIndex = globalUniqueTypeCount;

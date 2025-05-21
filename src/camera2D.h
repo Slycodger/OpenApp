@@ -1,16 +1,14 @@
 #pragma once
 #include "texture.h"
 #include "globals.h"
-#include <vector>
-#include <algorithm>
-#include "transform3D.h"
+#include "transform2D.h"
 #include "staticList.h"
 #include "shaderHandling.h"
 #include "program.h"
 
 namespace openApp {
-  class Camera3D : public Transform3D {
-    size_t camera3DIndex;
+  class Camera2D : public Transform2D {
+    size_t camera2DIndex;
 
   protected:
     unsigned int FBO;
@@ -23,28 +21,28 @@ namespace openApp {
     bool saveRenderBuffer;
     bool saveDepthStencilBuffer;
 
-    virtual void camera3DCopyTo(UniqueType* ptr) {}
-    virtual void camera3DUpdate() {}
-    virtual void camera3DAddedToGlobals() {}
-    virtual void camera3DSetParent(UniqueType* ptr) {}
-    virtual void camera3DAddedChild(UniqueType* ptr) {}
-    virtual void camera3DRemovingChild(size_t index) {}
+    virtual void camera2DCopyTo(UniqueType* ptr) {}
+    virtual void camera2DUpdate() {}
+    virtual void camera2DAddedToGlobals() {}
+    virtual void camera2DSetParent(UniqueType* ptr) {}
+    virtual void camera2DAddedChild(UniqueType* ptr) {}
+    virtual void camera2DRemovingChild(size_t index) {}
 
-    void transform3DSetParent(UniqueType* ptr) override {
+    void transform2DSetParent(UniqueType* ptr) override {
 
-      camera3DSetParent(ptr);
+      camera2DSetParent(ptr);
     }
-    void transform3DAddedChild(UniqueType* ptr) override {
+    void transform2DAddedChild(UniqueType* ptr) override {
 
-      camera3DAddedChild(ptr);
+      camera2DAddedChild(ptr);
     }
-    void transform3DRemovingChild(size_t index) override {
+    void transform2DRemovingChild(size_t index) override {
 
-      camera3DRemovingChild(index);
+      camera2DRemovingChild(index);
     }
 
-    void transform3DCopyTo(UniqueType* ptr) override {
-      Camera3D* cPtr = dynamic_cast<Camera3D*>(ptr);
+    void transform2DCopyTo(UniqueType* ptr) override {
+      Camera2D* cPtr = dynamic_cast<Camera2D*>(ptr);
       if (!cPtr)
         return;
 
@@ -68,12 +66,12 @@ namespace openApp {
       cPtr->far = far;
       cPtr->projection = glm::perspective(FOV * _degToRadF, aspect, near, far);
       cPtr->backgroundColor = backgroundColor;
-      
-      
-      camera3DCopyTo(ptr);
+
+
+      camera2DCopyTo(ptr);
     }
 
-    void transform3DUpdate() override {
+    void transform2DUpdate() override {
       glBindFramebuffer(GL_FRAMEBUFFER, FBO);
 
       if (saveRenderBuffer && savedRenderBuffer) {
@@ -109,12 +107,12 @@ namespace openApp {
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      camera3DUpdate();
+      camera2DUpdate();
     }
 
-    void transform3DAddedToGlobals() override {
+    void transform2DAddedToGlobals() override {
       addGlobalCamera3D(this);
-      camera3DAddedToGlobals();
+      camera2DAddedToGlobals();
     }
 
   public:
@@ -130,7 +128,7 @@ namespace openApp {
     Vector4 backgroundColor;
 
     UniqueType* create() override {
-      return new Camera3D();
+      return new Camera2D();
     }
 
     void active() {
@@ -143,10 +141,8 @@ namespace openApp {
 
     glm::mat4 getTransformMatrix() override {
       glm::mat4 mat(1);
-      mat = glm::rotate(mat, rotation.x * _degToRadF, glm::vec3(1, 0, 0));
-      mat = glm::rotate(mat, rotation.y * _degToRadF, glm::vec3(0, 1, 0));
-      mat = glm::rotate(mat, rotation.z * _degToRadF, glm::vec3(0, 0, 1));
-      mat = glm::translate(mat, glm::vec3(-position.x, -position.y, -position.z));
+      mat = glm::rotate(mat, rotation * _degToRadF, glm::vec3(0, 0, 1));
+      mat = glm::translate(mat, glm::vec3(-position.x, -position.y, 0));
       return mat;
     }
 
@@ -184,13 +180,15 @@ namespace openApp {
 
 
 
-    Camera3D() : Transform3D(), camera3DIndex(-1), FOV(), aspect(), near(), far(), stencilLayers(),
-      saveRenderBuffer(false), saveDepthStencilBuffer(false), savedDepthStencilBuffer(nullptr), savedRenderBuffer(nullptr), FBO(), projection() {}
+    Camera2D() : Transform2D(), camera2DIndex(-1), FOV(), aspect(), near(), far(), stencilLayers(),
+      saveRenderBuffer(false), saveDepthStencilBuffer(false), savedDepthStencilBuffer(nullptr), savedRenderBuffer(nullptr), FBO(), projection() {
+    }
 
-    Camera3D(bool sF) : Transform3D(sF), camera3DIndex(-1), FOV(), aspect(), near(), far(),
-      stencilLayers(), saveRenderBuffer(false), saveDepthStencilBuffer(false), FBO(), projection(), savedRenderBuffer(nullptr), savedDepthStencilBuffer(nullptr) {}
+    Camera2D(bool sF) : Transform2D(sF), camera2DIndex(-1), FOV(), aspect(), near(), far(),
+      stencilLayers(), saveRenderBuffer(false), saveDepthStencilBuffer(false), FBO(), projection(), savedRenderBuffer(nullptr), savedDepthStencilBuffer(nullptr) {
+    }
 
-    Camera3D(float fov, float Aspect, float N, float F, unsigned char Stencil, Vector4 bg) : Transform3D(), camera3DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F),
+    Camera2D(float fov, float Aspect, float N, float F, unsigned char Stencil, Vector4 bg) : Transform2D(), camera2DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F),
       stencilLayers(Stencil), saveRenderBuffer(false), saveDepthStencilBuffer(false),
       renderBuffer(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT), savedRenderBuffer(nullptr),
       depthStencilBuffer(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8),
@@ -205,7 +203,7 @@ namespace openApp {
       projection = glm::perspective(fov * _degToRadF, aspect, near, far);
       addGlobalCamera3D(this);
     }
-    Camera3D(float fov, float Aspect, float N, float F, unsigned int Stencil, Vector4 bg, bool sF) : Transform3D(sF), camera3DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F),
+    Camera2D(float fov, float Aspect, float N, float F, unsigned int Stencil, Vector4 bg, bool sF) : Transform2D(sF), camera2DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F),
       stencilLayers(Stencil), saveRenderBuffer(false), saveDepthStencilBuffer(false),
       renderBuffer(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT), savedRenderBuffer(nullptr),
       depthStencilBuffer(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8),
@@ -220,8 +218,8 @@ namespace openApp {
       projection = glm::perspective(fov * _degToRadF, aspect, near, far);
       addGlobalCamera3D(this);
     }
-    ~Camera3D() override {
-      removeGlobalCamera3D(this);
+    ~Camera2D() override {
+      removeGlobalCamera2D(this);
       if (savedRenderBuffer)
         delete(savedRenderBuffer);
       if (savedDepthStencilBuffer)
@@ -233,29 +231,29 @@ namespace openApp {
 
     //Static stuff
     //--------------------------------------------------
-    static Camera3D* mainCamera3D;
-    static size_t globalCamera3DCount;
-    static StaticList<Camera3D*> globalCamera3DInstances;
+    static Camera2D* mainCamera3D;
+    static size_t globalCamera2DCount;
+    static StaticList<Camera2D*> globalCamera2DInstances;
 
 
 
     //--------------------------------------------------
-    static Camera3D* getMainCamera3DIndex() {
+    static Camera2D* getMainCamera2DIndex() {
       return mainCamera3D;
     }
 
 
 
     //--------------------------------------------------
-    static Camera3D* getMainCamera3D() {
+    static Camera2D* getMainCamera2D() {
       return mainCamera3D;
     }
 
 
 
     //--------------------------------------------------
-    static void setMainCamera3D(Camera3D* cam) {
-      if (!cam || cam->camera3DIndex >= (size_t)-1) {
+    static void setMainCamera2D(Camera2D* cam) {
+      if (!cam || cam->camera2DIndex >= (size_t)-1) {
         mainCamera3D = nullptr;
         return;
       }
@@ -265,28 +263,28 @@ namespace openApp {
 
 
     //--------------------------------------------------
-    static size_t getGlobalCamera3DCount() {
-      return globalCamera3DCount;
+    static size_t getGlobalCamera2DCount() {
+      return globalCamera2DCount;
     }
 
 
 
     //--------------------------------------------------
-    static void addGlobalCamera3D(Camera3D* cam) {
-      cam->camera3DIndex = globalCamera3DInstances.addItem(cam);
-      if (cam->camera3DIndex >= (size_t)-1)
+    static void addGlobalCamera3D(Camera2D* cam) {
+      cam->camera2DIndex = globalCamera2DInstances.addItem(cam);
+      if (cam->camera2DIndex >= (size_t)-1)
         return;
-      globalCamera3DCount++;
+      globalCamera2DCount++;
     }
 
 
 
     //--------------------------------------------------
-    static void removeGlobalCamera3D(Camera3D* cam) {
-      if (!cam || cam->camera3DIndex >= (size_t)-1 || !globalCamera3DInstances.removeAt(cam->camera3DIndex))
+    static void removeGlobalCamera2D(Camera2D* cam) {
+      if (!cam || cam->camera2DIndex >= (size_t)-1 || !globalCamera2DInstances.removeAt(cam->camera2DIndex))
         return;
-      cam->camera3DIndex = -1;
-      globalCamera3DCount--;
+      cam->camera2DIndex = -1;
+      globalCamera2DCount--;
     }
   };
 }

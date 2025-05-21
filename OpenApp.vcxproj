@@ -136,13 +136,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dependencies\glad\src\glad.c" />
+    <ClCompile Include="src\camera2D.cpp" />
     <ClCompile Include="src\camera3D.cpp" />
     <ClCompile Include="src\drawing.cpp" />
     <ClCompile Include="src\exceptionHandling.cpp" />
     <ClCompile Include="src\image.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\material.cpp" />
-    <ClCompile Include="src\mesh.cpp" />
+    <ClCompile Include="src\mesh2D.cpp" />
+    <ClCompile Include="src\mesh3D.cpp" />
     <ClCompile Include="src\modelLoading.cpp" />
     <ClCompile Include="src\program.cpp" />
     <ClCompile Include="src\shaderHandling.cpp" />
@@ -150,16 +152,20 @@
     <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\uniqueType.cpp" />
     <ClCompile Include="src\vector.cpp" />
+    <ClCompile Include="src\visual2D.cpp" />
     <ClCompile Include="src\visual3D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\camera2D.h" />
     <ClInclude Include="src\camera3D.h" />
+    <ClInclude Include="src\cameraViewer.h" />
     <ClInclude Include="src\constants.h" />
     <ClInclude Include="src\exceptionHandling.h" />
     <ClInclude Include="src\globals.h" />
     <ClInclude Include="src\image.h" />
     <ClInclude Include="src\material.h" />
-    <ClInclude Include="src\mesh.h" />
+    <ClInclude Include="src\mesh2D.h" />
+    <ClInclude Include="src\mesh3D.h" />
     <ClInclude Include="src\modelLoading.h" />
     <ClInclude Include="src\openglBasics.h" />
     <ClInclude Include="src\program.h" />
@@ -167,16 +173,21 @@
     <ClInclude Include="src\sound.h" />
     <ClInclude Include="src\staticList.h" />
     <ClInclude Include="src\texture.h" />
+    <ClInclude Include="src\transform2D.h" />
     <ClInclude Include="src\transform3D.h" />
     <ClInclude Include="src\uniqueType.h" />
     <ClInclude Include="src\vector.h" />
+    <ClInclude Include="src\vertex2D.h" />
     <ClInclude Include="src\vertex3D.h" />
+    <ClInclude Include="src\visual2D.h" />
     <ClInclude Include="src\visual3D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lines.bat" />
+    <None Include="shaders\basic2DShader.vert" />
     <None Include="shaders\basicShader.frag" />
-    <None Include="shaders\basicShader.vert" />
+    <None Include="shaders\basic3DShader.vert" />
+    <None Include="shaders\common.glsl" />
     <None Include="shaders\textureShader.frag" />
     <None Include="shaders\viewportShader.vert" />
   </ItemGroup>
