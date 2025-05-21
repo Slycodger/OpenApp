@@ -1,8 +1,9 @@
 #include "visual3D.h"
 #include "camera3D.h"
 #include <iostream>
-#include "textures.h"
+#include "texture.h"
 #include "modelLoading.h"
+#include "sound.h"
 using namespace openApp;
 
 Camera3D* camera = nullptr;
@@ -78,7 +79,7 @@ Mesh* squareMesh = nullptr;
 Mesh* cubeMesh = nullptr;
 Visual3D* visual1 = nullptr;
 Visual3D* visual2 = nullptr;
-Visual3D* loaded = nullptr;
+Transform3D* loaded = nullptr;
 Visual3D* visual3 = nullptr;
 
 Material redColor = Material();
@@ -138,18 +139,21 @@ void progStart() {
   texCamera->saveRenderBuffer = true;
   visual1->srcMaterial.albedoTexture = &texCamera->savedRenderBuffer;
   
-  loaded = modelLoading::loadModel("./models/model.fbx");
+  loaded = dynamic_cast<Transform3D*>(modelLoading::loadModel("./models/model.fbx"));
   if (!loaded) {
     std::cout << "failed to load model\n";
   }
   else {
-    Visual3D::addGlobalVisual3D(loaded);
+    Visual3D::addTreeToGlobalVisual3D(loaded);
   }
 
-  Visual3D::addGlobalVisual3D(visual1);
-  Visual3D::addGlobalVisual3D(visual2);
-  Visual3D::addGlobalVisual3D(visual3);
+  Visual3D::addTreeToGlobalVisual3D(visual1);
+  Visual3D::addTreeToGlobalVisual3D(visual2);
+  Visual3D::addTreeToGlobalVisual3D(visual3);
 }
+
+bool doom = false;
+int dings = 0;
 
 void progUpdate() {
   camera->position.z += 0.5f * _DELTA_TIME;
@@ -158,8 +162,17 @@ void progUpdate() {
   visual3->rotation.y += 30.f * _DELTA_TIME;
   visual3->rotation.x += 15.f * _DELTA_TIME;
 
-  if (_APP_TIME > 2.0f)
+  if (_APP_TIME > 2.0f) {
     loaded->rotation.x += 45.f * _DELTA_TIME;
+    if (dings < 1000) {
+      sound::queueSound("./sounds/ding.wav");
+      dings++;
+    }
+    if (!doom) {
+      sound::playMusic("./sounds/doom.mp3");
+      doom = true;
+    }
+  }
 }
 
 void progEnd() {

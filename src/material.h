@@ -1,7 +1,7 @@
 #pragma once
 #include "openglBasics.h"
 #include "shaderHandling.h"
-#include "textures.h"
+#include "texture.h"
 #include <map>
 #include <string>
 

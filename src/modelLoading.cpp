@@ -7,7 +7,7 @@
 using namespace openApp;
 using namespace openApp::modelLoading;
 
-std::map<std::string, Visual3D*> modelsLoaded = std::map<std::string, Visual3D*>();
+std::map<std::string, UniqueType*> modelsLoaded = std::map<std::string, UniqueType*>();
 
 
 namespace openApp {
@@ -34,53 +34,61 @@ namespace openApp {
       return mesh;
     }
 
-    Visual3D* handleNode(const aiScene* scene, const aiNode* node, Visual3D* parent) {
+    Transform3D* handleNode(const aiScene* scene, const aiNode* node, Transform3D* parent) {
       if (!node)
         return nullptr;
 
-      Visual3D* visual = new Visual3D(nullptr, 0xff, true);
-      if (node->mNumMeshes)
-        visual->mesh = handleMesh(scene->mMeshes[node->mMeshes[0]]);
+      Transform3D* ret = nullptr;
+      Visual3D* asV = nullptr;
+      if (node->mNumMeshes) {
+        asV = new Visual3D(nullptr, 0xff, true);
+        ret = asV;
+        asV->mesh = handleMesh(scene->mMeshes[node->mMeshes[0]]);
+      } else
+        ret = new Transform3D(true);
+
+
+
 
       if (parent)
-        visual->setParent(parent);
+        ret->setParent(parent);
       
       aiVector3t<ai_real> pos;
       aiVector3t<ai_real> rot;
       aiVector3t<ai_real> scale;
       node->mTransformation.Decompose(scale, rot, pos);
       if (parent) {
-        visual->relativePosition = Vector3(pos.x, pos.y, pos.z);
-        visual->relativeRotation = Vector3(rot.x * _radToDegF, rot.y * _radToDegF, rot.z * _radToDegF);
-        visual->relativeScale = Vector3(scale.x, scale.y, scale.z);
-        visual->relativeParentRotation = parent->rotation;
-        visual->updateTransform();
+        ret->relativePosition = Vector3(pos.x, pos.y, pos.z);
+        ret->relativeRotation = Vector3(rot.x * _radToDegF, rot.y * _radToDegF, rot.z * _radToDegF);
+        ret->relativeScale = Vector3(scale.x, scale.y, scale.z);
+        ret->relativeParentRotation = parent->rotation;
+        ret->updateTransform();
       }
       else {
-        visual->position = Vector3(pos.x, pos.y, pos.z);
-        visual->rotation = Vector3(rot.x * _radToDegF, rot.y * _radToDegF, rot.z * _radToDegF);
-        visual->scale = Vector3(scale.x, scale.y, scale.z);
+        ret->position = Vector3(pos.x, pos.y, pos.z);
+        ret->rotation = Vector3(rot.x * _radToDegF, rot.y * _radToDegF, rot.z * _radToDegF);
+        ret->scale = Vector3(scale.x, scale.y, scale.z);
       }
 
       for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        Visual3D* child = handleNode(scene, node->mChildren[i], visual);
+        handleNode(scene, node->mChildren[i], ret);
       }
 
-      return visual;
+      return ret;
     }
 
-    Visual3D* handleScene(const aiScene* scene) {
+    UniqueType* handleScene(const aiScene* scene) {
       if (!scene->mRootNode)
         return nullptr;
 
-      Visual3D* visual = handleNode(scene, scene->mRootNode, nullptr);
+      UniqueType* visual = handleNode(scene, scene->mRootNode, nullptr);
 
       return visual;
     }
 
 
 
-    Visual3D* loadModel(std::string path) {
+    UniqueType* loadModel(std::string path) {
       if (modelsLoaded.contains(path))
         return modelsLoaded[path];
 
@@ -90,7 +98,7 @@ namespace openApp {
         modelsLoaded.insert({ path, nullptr });
         return nullptr;
       }
-      Visual3D* visual = handleScene(scene);
+      UniqueType* visual = handleScene(scene);
       modelsLoaded.insert({ path, visual });
       return visual;
     }
@@ -98,7 +106,7 @@ namespace openApp {
 
 
     void end() {
-      for (std::pair<std::string, Visual3D*> p : modelsLoaded) {
+      for (std::pair<std::string, UniqueType*> p : modelsLoaded) {
         if (p.second)
           delete(p.second);
       }

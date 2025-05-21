@@ -9,10 +9,38 @@
 namespace openApp {
   class Transform3D : public UniqueType {
   protected:
-    size_t childIndex;
-    Transform3D* parent;
-
     virtual void transform3DCopyTo(UniqueType* ptr) {}
+    virtual void transform3DUpdate() {}
+    virtual void transform3DAddedToGlobals() {}
+    virtual void transform3DSetParent(UniqueType* ptr) {}
+
+    void uniqueTypeSetParent(UniqueType* ptr) override {
+      Transform3D* tPtr = dynamic_cast<Transform3D*>(ptr);
+      if (!tPtr) {
+        relativePosition = Vector3();
+        relativeRotation = Vector3();
+        relativeScale = Vector3(1);
+        relativeParentRotation = Vector3();
+        return;
+      }
+
+      relativePosition = position - tPtr->position;
+      relativeParentRotation = tPtr->rotation;
+      relativeScale = scale / tPtr->scale;
+      relativeRotation = rotation - tPtr->rotation;
+
+      transform3DSetParent(ptr);
+    }
+
+    void uniqueTypeUpdate() override {
+      if (!parent)
+        updateTransformTree();
+
+      transform3DUpdate();
+    }
+    void uniqueTypeAddedToGlobals() override {
+      transform3DAddedToGlobals();
+    }
 
 
     void copyTo(UniqueType* ptr) override {
@@ -29,7 +57,6 @@ namespace openApp {
     }
 
   public:
-    StaticList<Transform3D*> children;
 
     Vector3 position;
     Vector3 scale;
@@ -50,25 +77,15 @@ namespace openApp {
     }
 
 
-    virtual void transform3DUpdate() {}
-    virtual void transform3DAddedToGlobals() {}
 
-
-
-    void uniqueTypeUpdate() override {
-      if (!parent)
-        updateTransformTree();
-
-      transform3DUpdate();
-    }
-    void uniqueTypeAddedToGlobals() override {
-      transform3DAddedToGlobals();
-    }
     UniqueType* create() override {
       return new Transform3D();
     }
 
     void updateTransform() {
+      if (!parent)
+        return;
+      Transform3D* parent = dynamic_cast<Transform3D*>(this->parent);
       if (!parent)
         return;
 
@@ -120,69 +137,21 @@ namespace openApp {
       if (children.size() <= 0)
         return;
 
-      for (Transform3D** childP : children) {
-        (*childP)->updateTransform();
-        
-        (*childP)->updateTransformTree();
+      for (UniqueType** childP : children) {
+        if (!childP || !*childP)
+          continue;
+        Transform3D* tPtr = dynamic_cast<Transform3D*>(*childP);
+        if (!tPtr)
+          continue;
+
+        tPtr->updateTransform();
+        tPtr->updateTransformTree();
       }
     }
 
 
-    void setParent(Transform3D* p) {
-      p->addChild(this);
-    }
-
-    Transform3D* getParent() {
-      return parent;
-    }
-
-    void removeParent() {
-      if (!parent)
-        return;
-      parent->children.removeAt(childIndex);
-      childIndex = -1;
-      parent = nullptr;
-      relativePosition = Vector3();
-      relativeScale = Vector3(1);
-      relativeRotation = Vector3();
-    }
-
-    void addChild(Transform3D* c) {
-      if (c->parent)
-        c->removeParent();
-      c->childIndex = children.addItem(c);
-      if (c->childIndex >= (size_t)-1)
-        return;
-      c->parent = this;
-
-      c->relativePosition = c->position - position;
-      c->relativeParentRotation = rotation;
-      c->relativeScale = c->scale / scale;
-      c->relativeRotation = c->rotation - rotation;
-    }
-
-    void removeChild(size_t& visual3DIndex) {
-      Transform3D* c = *children[visual3DIndex];
-      if (!c)
-        return;
-      c->removeParent();
-    }
-
-    bool hasParent() {
-      return parent;
-    }
-
-
-    Transform3D() : UniqueType(), position(), scale(1), rotation(), relativePosition(), relativeScale(1), relativeRotation(), relativeParentRotation(), children(1), childIndex(-1), parent(0) {}
-    Transform3D(bool sF) : UniqueType(sF), position(), scale(1), rotation(), relativePosition(), relativeScale(1), relativeRotation(), relativeParentRotation(), children(1), childIndex(-1), parent(0) {}
-    ~Transform3D() override {
-      if (selfContained) {
-        for (Transform3D** child : children) {
-          if (*child)
-            delete(*child);
-        }
-        children.clear();
-      }
-    }
+    Transform3D() : UniqueType(), position(), scale(1), rotation(), relativePosition(), relativeScale(1), relativeRotation(), relativeParentRotation(){}
+    Transform3D(bool sF) : UniqueType(sF), position(), scale(1), rotation(), relativePosition(), relativeScale(1), relativeRotation(), relativeParentRotation() {}
+    ~Transform3D() override {}
   };
 }

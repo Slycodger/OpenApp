@@ -6,8 +6,9 @@
 #include "program.h"
 #include "visual3D.h"
 #include <chrono>
-#include "images.h"
+#include "image.h"
 #include "modelLoading.h"
+#include "sound.h"
 
 void progStart();
 void progUpdate();
@@ -127,6 +128,7 @@ int main() {
   glBindVertexArray(0);
 
 
+  sound::start();
   progStart();
 
  
@@ -138,6 +140,7 @@ int main() {
 
     UniqueType::updateUniqueTypeInstances();
     Visual3D::drawVisual3DInstances();
+    sound::update();
     progUpdate();
 
     defaultView();
@@ -169,6 +172,7 @@ int main() {
   Material::end();
   image::end();
   modelLoading::end();
+  sound::end();
 }
 
 

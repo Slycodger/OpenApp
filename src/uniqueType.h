@@ -8,12 +8,20 @@ namespace openApp {
 
   protected:
     virtual void copyTo(UniqueType* ptr) {}
+    virtual void uniqueTypeUpdate() {}
+    virtual void uniqueTypeAddedToGlobals() {}
+    virtual void uniqueTypeSetParent(UniqueType* ptr) {}
+
+
+    size_t childIndex;
+    UniqueType* parent;
 
     bool selfContained;
 
   public:
-    virtual void uniqueTypeUpdate() {}
-    virtual void uniqueTypeAddedToGlobals() {}
+    StaticList<UniqueType*> children;
+
+
     virtual UniqueType* create() { return new UniqueType(); }
     UniqueType* createCopyOf() {
       UniqueType* t = create();
@@ -30,9 +38,57 @@ namespace openApp {
       uniqueTypeUpdate();
     }
 
-    UniqueType() : uniqueTypeIndex(-1), selfContained(false) {}
-    UniqueType(bool sF) : uniqueTypeIndex(-1), selfContained(sF) {}
-    virtual ~UniqueType() {}
+
+    void setParent(UniqueType* p) {
+      p->addChild(this);
+    }
+
+    UniqueType* getParent() {
+      return parent;
+    }
+
+    void removeParent() {
+      if (!parent)
+        return;
+      parent->children.removeAt(childIndex);
+      childIndex = -1;
+      parent = nullptr;
+      uniqueTypeSetParent(nullptr);
+    }
+
+    void addChild(UniqueType* c) {
+      if (c->parent)
+        c->removeParent();
+      c->childIndex = children.addItem(c);
+      if (c->childIndex >= (size_t)-1)
+        return;
+      c->parent = this;
+    }
+
+    void removeChild(size_t& visual3DIndex) {
+      UniqueType* c = *children[visual3DIndex];
+      if (!c)
+        return;
+      c->removeParent();
+    }
+
+    bool hasParent() {
+      return parent;
+    }
+
+
+
+    UniqueType() : uniqueTypeIndex(-1), selfContained(false), parent(0), childIndex(-1), children() {}
+    UniqueType(bool sF) : uniqueTypeIndex(-1), parent(0), children(), childIndex(-1), selfContained(sF) {}
+    virtual ~UniqueType() {
+      if (selfContained) {
+        for (UniqueType** child : children) {
+          if (*child)
+            delete(*child);
+        }
+        children.clear();
+      }
+    }
 
 
 

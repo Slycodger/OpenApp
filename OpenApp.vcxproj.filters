@@ -26,7 +26,7 @@
     <ClCompile Include="src\shaderHandling.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
-    <ClCompile Include="src\textures.cpp">
+    <ClCompile Include="src\texture.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
     <ClCompile Include="src\uniqueType.cpp">
@@ -38,10 +38,13 @@
     <ClCompile Include="src\visual3D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
-    <ClCompile Include="src\images.cpp">
+    <ClCompile Include="src\image.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
     <ClCompile Include="src\modelLoading.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sound.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,7 +105,7 @@
     <ClInclude Include="src\staticList.h">
       <Filter>src\header</Filter>
     </ClInclude>
-    <ClInclude Include="src\textures.h">
+    <ClInclude Include="src\texture.h">
       <Filter>src\header</Filter>
     </ClInclude>
     <ClInclude Include="src\transform3D.h">
@@ -120,10 +123,13 @@
     <ClInclude Include="src\visual3D.h">
       <Filter>src\header</Filter>
     </ClInclude>
-    <ClInclude Include="src\images.h">
+    <ClInclude Include="src\image.h">
       <Filter>src\header</Filter>
     </ClInclude>
     <ClInclude Include="src\modelLoading.h">
+      <Filter>src\header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sound.h">
       <Filter>src\header</Filter>
     </ClInclude>
   </ItemGroup>

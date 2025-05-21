@@ -1,5 +1,5 @@
 #pragma once
-#include "textures.h"
+#include "texture.h"
 #include "globals.h"
 #include <vector>
 #include <algorithm>
@@ -20,7 +20,16 @@ namespace openApp {
     float far;
     glm::mat4 projection;
 
-    void camera3DCopyTo(UniqueType* ptr) {}
+    virtual void camera3DCopyTo(UniqueType* ptr) {}
+    virtual void camera3DUpdate() {}
+    virtual void camera3DAddedToGlobals() {}
+    virtual void camera3DSetParent(UniqueType* ptr) {}
+
+    void transform3DSetParent(UniqueType* ptr) {
+
+      camera3DSetParent(ptr);
+    }
+
     void transform3DCopyTo(UniqueType* ptr) override {
       Camera3D* cPtr = dynamic_cast<Camera3D*>(ptr);
       if (!cPtr)
@@ -52,44 +61,6 @@ namespace openApp {
       
       
       camera3DCopyTo(ptr);
-    }
-
-  public:
-    virtual void camera3DUpdate() {}
-    virtual void camera3DAddedToGlobals() {}
-
-
-    unsigned char stencilLayers;
-    Texture renderBuffer;
-    Texture depthStencilBuffer;
-
-    Texture savedRenderBuffer;
-    Texture savedDepthStencilBuffer;
-
-    Vector4 backgroundColor;
-
-    bool saveRenderBuffer;
-    bool saveDepthStencilBuffer;
-
-    UniqueType* create() override {
-      return new Camera3D();
-    }
-
-    void active() {
-      glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-    }
-
-    float* getProjection() {
-      return glm::value_ptr(projection);
-    }
-
-    glm::mat4 getTransformMatrix() override {
-      glm::mat4 mat(1);
-      mat = glm::rotate(mat, rotation.x * _degToRadF, glm::vec3(1, 0, 0));
-      mat = glm::rotate(mat, rotation.y * _degToRadF, glm::vec3(0, 1, 0));
-      mat = glm::rotate(mat, rotation.z * _degToRadF, glm::vec3(0, 0, 1));
-      mat = glm::translate(mat, glm::vec3(-position.x, -position.y, -position.z));
-      return mat;
     }
 
     void transform3DUpdate() override {
@@ -134,6 +105,42 @@ namespace openApp {
     void transform3DAddedToGlobals() override {
       addGlobalCamera(this);
       camera3DAddedToGlobals();
+    }
+
+  public:
+
+
+    unsigned char stencilLayers;
+    Texture renderBuffer;
+    Texture depthStencilBuffer;
+
+    Texture savedRenderBuffer;
+    Texture savedDepthStencilBuffer;
+
+    Vector4 backgroundColor;
+
+    bool saveRenderBuffer;
+    bool saveDepthStencilBuffer;
+
+    UniqueType* create() override {
+      return new Camera3D();
+    }
+
+    void active() {
+      glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    }
+
+    float* getProjection() {
+      return glm::value_ptr(projection);
+    }
+
+    glm::mat4 getTransformMatrix() override {
+      glm::mat4 mat(1);
+      mat = glm::rotate(mat, rotation.x * _degToRadF, glm::vec3(1, 0, 0));
+      mat = glm::rotate(mat, rotation.y * _degToRadF, glm::vec3(0, 1, 0));
+      mat = glm::rotate(mat, rotation.z * _degToRadF, glm::vec3(0, 0, 1));
+      mat = glm::translate(mat, glm::vec3(-position.x, -position.y, -position.z));
+      return mat;
     }
 
 

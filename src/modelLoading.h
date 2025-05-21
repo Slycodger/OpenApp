@@ -3,7 +3,7 @@
 
 namespace openApp {
   namespace modelLoading {
-    Visual3D* loadModel(std::string path);
+    UniqueType* loadModel(std::string path);
     void end();
   }
 }

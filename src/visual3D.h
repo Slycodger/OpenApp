@@ -12,6 +12,9 @@ namespace openApp {
   protected:
     static Shader visual3DShader;
     static unsigned int materialUBO;
+    virtual void visual3DUpdate() {}
+    virtual void visual3DAddedToGlobals() {}
+    virtual void visual3DSetParent(UniqueType* ptr) {}
 
     void visual3DCopyTo(UniqueType* ptr) {}
     void transform3DCopyTo(UniqueType* ptr) override {
@@ -27,20 +30,6 @@ namespace openApp {
       visual3DCopyTo(ptr);
     }
 
-  public:
-    Material srcMaterial;
-    Material* material;
-    Mesh* mesh;
-    unsigned char stencilLayers;
-
-
-    virtual void visual3DUpdate() {}
-    virtual void visual3DAddedToGlobals() {}
-
-    UniqueType* create() override {
-      return new Visual3D();
-    }
-
     void transform3DUpdate() override {
 
       visual3DUpdate();
@@ -51,9 +40,25 @@ namespace openApp {
       visual3DAddedToGlobals();
     }
 
+    void transform3DSetParent(UniqueType* ptr) override {
+
+      visual3DSetParent(ptr);
+    }
+
+  public:
+    Material srcMaterial;
+    Material* material;
+    Mesh* mesh;
+    unsigned char stencilLayers;
+
+
+    UniqueType* create() override {
+      return new Visual3D();
+    }
+
     Visual3D() : Transform3D(), mesh(0), stencilLayers(), visual3DIndex(-1), srcMaterial(), material(0) {}
     Visual3D(Mesh* mesh, unsigned char StencilLayer) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
-    Visual3D(Mesh* mesh, unsigned char StencilLayer, bool sF) : Transform3D(), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
+    Visual3D(Mesh* mesh, unsigned char StencilLayer, bool sF) : Transform3D(sF), mesh(mesh), stencilLayers(StencilLayer), visual3DIndex(-1), srcMaterial(), material(0) {}
     ~Visual3D() override {
       if (selfContained) {
         if (mesh)
@@ -73,23 +78,24 @@ namespace openApp {
 
 
     //--------------------------------------------------
-    static bool addGlobalVisual3D(Visual3D* visual) {
+    static void addTreeToGlobalVisual3D(UniqueType* ptr) {
+      for (UniqueType** c : ptr->children) {
+        if (!c || !*c)
+          continue;
+        addTreeToGlobalVisual3D(*c);
+      }
+
+
+      Visual3D* visual = dynamic_cast<Visual3D*>(ptr);
+      if (!visual)
+        return;
       if (visual->visual3DIndex < (size_t)-1)
-        return false;
+        return;
+
       visual->visual3DIndex = globalVisual3DCount;
       globalVisual3DCount++;
       globalVisual3DInstances.addItem(visual);
       UniqueType::addGlobalUniqueType(visual);
-      for (Transform3D** c : visual->children) {
-        if (!c || !*c)
-          continue;
-        Visual3D* ptr = dynamic_cast<Visual3D*>(*c);
-        if (!ptr)
-          continue;
-        addGlobalVisual3D(ptr);
-      }
-
-      return true;
     }
 
 

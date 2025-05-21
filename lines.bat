@@ -20,13 +20,14 @@ echo src files : %srcFiles%
 echo src lines : %srcLines%
 echo --------------------------------------------------
 echo shader files : %shaderFiles%
-echo shaders lines :  %shaderLines%
+echo shader lines :  %shaderLines%
 
-echo src files : %srcFiles%> %file%
-echo src lines : %srcLines%>> %file%
+
+echo src files : %srcFiles% > %file%
+echo src lines : %srcLines% >> %file%
 echo -------------------------------------------------->> %file%
-echo shader files : %shaderFiles%>> %file%
-echo shaders lines : %shaderLines%>> %file%
+echo shader files : %shaderFiles% >> %file%
+echo shader lines : %shaderLines% >> %file%
 pause
 exit
 @echo on

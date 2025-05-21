@@ -71,9 +71,13 @@ namespace openApp {
 
 
     StaticListIterator begin() {
+      if (!internal)
+        return StaticListIterator(nullptr, nullptr);
       return StaticListIterator(internal, internal + farthest + 1);
     }
     StaticListIterator end() {
+      if (!internal)
+        return StaticListIterator(nullptr, nullptr);
       return StaticListIterator(internal + farthest + 1, internal + farthest + 1);
     }
 
@@ -184,7 +188,8 @@ namespace openApp {
         }
       }
       bufferSize = newSize;
-      delete[](internal);
+      if (internal)
+        delete[](internal);
       internal = newLoc;
     }
 
