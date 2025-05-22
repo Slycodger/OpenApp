@@ -348,6 +348,7 @@ namespace openApp {
     void defaultView() {
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       glStencilFunc(GL_ALWAYS, 0, 0);
+      glViewport(0, 0, _SCREEN_SIZE.x, _SCREEN_SIZE.y);
     }
   }
 }

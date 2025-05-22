@@ -67,6 +67,61 @@ namespace openApp {
     unsigned int y;
 
 
+    UIVector2 operator - (const UIVector2& vec) const {
+      UIVector2 t = *this;
+      t.x -= vec.x;
+      t.y -= vec.y;
+      return t;
+    }
+    UIVector2 operator + (const UIVector2& vec) const {
+      UIVector2 t = *this;
+      t.x += vec.x;
+      t.y += vec.y;
+      return t;
+    }
+    UIVector2 operator / (const UIVector2& vec) const {
+      UIVector2 t = *this;
+      t.x /= vec.x;
+      t.y /= vec.y;
+      return t;
+    }
+    UIVector2 operator * (const UIVector2& vec) const {
+      UIVector2 t = *this;
+      t.x *= vec.x;
+      t.y *= vec.y;
+      return t;
+    }
+    UIVector2 operator * (const float& vec) const {
+      UIVector2 t = *this;
+      t.x *= vec;
+      t.y *= vec;
+      return t;
+    }
+
+    UIVector2& operator += (const UIVector2& vec) {
+      x += vec.x;
+      y += vec.y;
+      return *this;
+    }
+    UIVector2& operator += (const float val) {
+      x += val;
+      y += val;
+      return *this;
+    }
+    UIVector2& operator *= (const float val) {
+      x *= val;
+      y *= val;
+      return *this;
+    }
+
+    bool operator == (const UIVector2& v) const {
+      return this->x == v.x && this->y == v.y;
+    }
+    bool operator != (const UIVector2& v) {
+      return !(*this == v);
+    }
+
+
     UIVector2() : x(0), y(0) {}
     UIVector2(unsigned int t) : x(t), y(t) {}
     UIVector2(unsigned int a, unsigned int b) : x(a), y(b) {}
@@ -150,6 +205,55 @@ namespace openApp {
     unsigned int x;
     unsigned int y;
     unsigned int z;
+
+
+    UIVector3 operator - (const UIVector3& vec) const {
+      UIVector3 t = *this;
+      t.x -= vec.x;
+      t.y -= vec.y;
+      t.z -= vec.z;
+      return t;
+    }
+    UIVector3 operator + (const UIVector3& vec) const {
+      UIVector3 t = *this;
+      t.x += vec.x;
+      t.y += vec.y;
+      t.z += vec.z;
+      return t;
+    }
+    UIVector3 operator / (const UIVector3& vec) const {
+      UIVector3 t = *this;
+      t.x /= vec.x;
+      t.y /= vec.y;
+      t.z /= vec.z;
+      return t;
+    }
+    UIVector3 operator * (const UIVector3& vec) const {
+      UIVector3 t = *this;
+      t.x *= vec.x;
+      t.y *= vec.y;
+      t.z *= vec.z;
+      return t;
+    }
+
+    UIVector3& operator += (const UIVector3& vec) {
+      x += vec.x;
+      y += vec.y;
+      z += vec.z;
+      return *this;
+    }
+    UIVector3& operator += (const float val) {
+      x += val;
+      y += val;
+      z += val;
+      return *this;
+    }
+    UIVector3& operator *= (const float val) {
+      x *= val;
+      y *= val;
+      z *= val;
+      return *this;
+    }
 
 
     UIVector3() : x(0), y(0), z(0) {}

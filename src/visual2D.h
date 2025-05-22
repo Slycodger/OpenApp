@@ -57,6 +57,7 @@ namespace openApp {
     Material srcMaterial;
     Material* material;
     Mesh2D* mesh;
+    int zIndex;
     unsigned char stencilLayers;
 
 
@@ -64,9 +65,9 @@ namespace openApp {
       return new Visual2D();
     }
 
-    Visual2D() : Transform2D(), mesh(0), stencilLayers(), visual2DIndex(-1), srcMaterial(), material(0) {}
-    Visual2D(Mesh2D* mesh, unsigned char StencilLayer) : Transform2D(), mesh(mesh), stencilLayers(StencilLayer), visual2DIndex(-1), srcMaterial(), material(0) {}
-    Visual2D(Mesh2D* mesh, unsigned char StencilLayer, bool sF) : Transform2D(sF), mesh(mesh), stencilLayers(StencilLayer), visual2DIndex(-1), srcMaterial(), material(0) {}
+    Visual2D() : Transform2D(), mesh(0), zIndex(0), stencilLayers(), visual2DIndex(-1), srcMaterial(), material(0) {}
+    Visual2D(Mesh2D* mesh, int ZIndex, unsigned char StencilLayer) : Transform2D(), zIndex(ZIndex), mesh(mesh), stencilLayers(StencilLayer), visual2DIndex(-1), srcMaterial(), material(0) {}
+    Visual2D(Mesh2D* mesh, int ZIndex, unsigned char StencilLayer, bool sF) : Transform2D(sF), zIndex(ZIndex), mesh(mesh), stencilLayers(StencilLayer), visual2DIndex(-1), srcMaterial(), material(0) {}
     ~Visual2D() override {
       if (selfContained) {
         if (mesh)
@@ -142,6 +143,7 @@ namespace openApp {
       glBindBuffer(GL_UNIFORM_BUFFER, program::getShaderMaterialUBO());
 
       Shader::setMat4("transform", visual->getTransformMatrix());
+      Shader::setInt("zIndex", visual->zIndex);
 
       if (visual->material)
         visual->material->applyToShader();
@@ -184,6 +186,7 @@ namespace openApp {
         if (!visual->mesh)
           continue;
         Shader::setMat4("transform", visual->getTransformMatrix());
+        Shader::setInt("zIndex", visual->zIndex);
 
         if (visual->material)
           visual->material->applyToShader();

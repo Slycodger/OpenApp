@@ -14,14 +14,11 @@ namespace openApp {
 
   protected:
     unsigned int FBO;
-    float FOV;
-    float aspect;
-    float near;
-    float far;
     glm::mat4 projection;
 
     bool saveRenderBuffer;
     bool saveDepthStencilBuffer;
+    UIVector2 viewportSize;
 
     virtual void camera3DCopyTo(UniqueType* ptr) {}
     virtual void camera3DUpdate() {}
@@ -120,6 +117,13 @@ namespace openApp {
   public:
 
 
+    float FOV;
+    float aspect;
+    float near;
+    float far;
+    float width;
+    float height;
+
     unsigned char stencilLayers;
     Texture renderBuffer;
     Texture depthStencilBuffer;
@@ -129,12 +133,74 @@ namespace openApp {
 
     Vector4 backgroundColor;
 
+    bool perspective;
+
     UniqueType* create() override {
       return new Camera3D();
     }
 
     void active() {
       glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+      glViewport(0, 0, viewportSize.x, viewportSize.y);
+    }
+
+    void updateTextureFiltering(unsigned int Filtering) {
+      if (Filtering == 0)
+        Filtering = renderBuffer.getFiltering();
+
+      renderBuffer.setFiltering(Filtering);
+      depthStencilBuffer.setFiltering(Filtering);
+      if (savedRenderBuffer)
+        savedRenderBuffer->setFiltering(Filtering);
+      if (savedDepthStencilBuffer)
+        savedDepthStencilBuffer->setFiltering(Filtering);
+    }
+
+    UIVector2 getSize() {
+      return viewportSize;
+    }
+
+    void resize(UIVector2 newSize, bool instant) {
+      if (newSize == 0)
+        newSize = viewportSize;
+
+      if (instant) {
+        unsigned int tFBO = FBO;
+        unsigned int tR = renderBuffer;
+        unsigned int tDS = depthStencilBuffer;
+
+        renderBuffer.resize(newSize, false);
+        depthStencilBuffer.resize(newSize, false);
+        if (savedRenderBuffer)
+          savedRenderBuffer->resize(newSize, true);
+        if (savedDepthStencilBuffer)
+          savedDepthStencilBuffer->resize(newSize, true);
+
+        glGenFramebuffers(1, &FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthStencilBuffer, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glBlitNamedFramebuffer(tFBO, FBO, 0, 0, viewportSize.x, viewportSize.y, 0, 0, newSize.x, newSize.y, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+
+        glDeleteFramebuffers(1, &tFBO);
+        glDeleteTextures(1, &tR);
+        glDeleteTextures(1, &tDS);
+      } else {
+        renderBuffer.resize(newSize, true);
+        depthStencilBuffer.resize(newSize, true);
+        if (savedRenderBuffer)
+          savedRenderBuffer->resize(newSize, true);
+        if (savedDepthStencilBuffer)
+          savedDepthStencilBuffer->resize(newSize, true);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderBuffer, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthStencilBuffer, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      }
+      viewportSize = newSize;
     }
 
     float* getProjection() {
@@ -148,6 +214,13 @@ namespace openApp {
       mat = glm::rotate(mat, rotation.z * _degToRadF, glm::vec3(0, 0, 1));
       mat = glm::translate(mat, glm::vec3(-position.x, -position.y, -position.z));
       return mat;
+    }
+
+    void updateProjection() {
+      if (perspective)
+        projection = glm::perspective(FOV * _degToRadF, aspect, near, far);
+      else
+        projection = glm::ortho(-width, width, -height, height, near, far);
     }
 
     bool savingRenderBuffer() {
@@ -184,16 +257,20 @@ namespace openApp {
 
 
 
-    Camera3D() : Transform3D(), camera3DIndex(-1), FOV(), aspect(), near(), far(), stencilLayers(),
+    //default
+    Camera3D() : Transform3D(), perspective(true), width(0), height(0), camera3DIndex(-1), FOV(), aspect(), near(), far(), stencilLayers(), viewportSize(), 
       saveRenderBuffer(false), saveDepthStencilBuffer(false), savedDepthStencilBuffer(nullptr), savedRenderBuffer(nullptr), FBO(), projection() {}
 
-    Camera3D(bool sF) : Transform3D(sF), camera3DIndex(-1), FOV(), aspect(), near(), far(),
+
+    //default with self contained
+    Camera3D(bool sF) : Transform3D(sF), perspective(true), width(0), height(0), camera3DIndex(-1), FOV(), aspect(), near(), far(), viewportSize(),
       stencilLayers(), saveRenderBuffer(false), saveDepthStencilBuffer(false), FBO(), projection(), savedRenderBuffer(nullptr), savedDepthStencilBuffer(nullptr) {}
 
-    Camera3D(float fov, float Aspect, float N, float F, unsigned char Stencil, Vector4 bg) : Transform3D(), camera3DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F),
+    //perspective
+    Camera3D(float fov, float Aspect, float N, float F, unsigned char Stencil, UIVector2 vP, Vector4 bg) : Transform3D(), perspective(true), width(0), height(0), camera3DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F), viewportSize(vP),
       stencilLayers(Stencil), saveRenderBuffer(false), saveDepthStencilBuffer(false),
-      renderBuffer(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT), savedRenderBuffer(nullptr),
-      depthStencilBuffer(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8),
+      renderBuffer(vP, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT), savedRenderBuffer(nullptr),
+      depthStencilBuffer(vP, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8),
       savedDepthStencilBuffer(nullptr), backgroundColor(bg) {
 
       glGenFramebuffers(1, &FBO);
@@ -205,10 +282,12 @@ namespace openApp {
       projection = glm::perspective(fov * _degToRadF, aspect, near, far);
       addGlobalCamera3D(this);
     }
-    Camera3D(float fov, float Aspect, float N, float F, unsigned int Stencil, Vector4 bg, bool sF) : Transform3D(sF), camera3DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F),
+
+    //perspective with self contained
+    Camera3D(float fov, float Aspect, float N, float F, unsigned int Stencil, UIVector2 vP, Vector4 bg, bool sF) : Transform3D(sF), perspective(true), camera3DIndex(-1), FOV(fov), aspect(Aspect), near(N), far(F), viewportSize(vP),
       stencilLayers(Stencil), saveRenderBuffer(false), saveDepthStencilBuffer(false),
-      renderBuffer(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT), savedRenderBuffer(nullptr),
-      depthStencilBuffer(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8),
+      renderBuffer(vP, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT), savedRenderBuffer(nullptr),
+      depthStencilBuffer(vP, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8),
       savedDepthStencilBuffer(nullptr), backgroundColor(bg) {
 
       glGenFramebuffers(1, &FBO);
@@ -220,6 +299,7 @@ namespace openApp {
       projection = glm::perspective(fov * _degToRadF, aspect, near, far);
       addGlobalCamera3D(this);
     }
+
     ~Camera3D() override {
       removeGlobalCamera3D(this);
       if (savedRenderBuffer)
