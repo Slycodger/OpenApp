@@ -1,6 +1,5 @@
 #pragma once
 #include "texture.h"
-#include "globals.h"
 #include "transform2D.h"
 #include "staticList.h"
 #include "shaderHandling.h"
@@ -46,8 +45,8 @@ namespace openApp {
 
 
 
-      cPtr->renderBuffer = Texture(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT);
-      cPtr->depthStencilBuffer = Texture(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+      cPtr->renderBuffer = Texture(viewportSize, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT);
+      cPtr->depthStencilBuffer = Texture(viewportSize, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
       glGenFramebuffers(1, &cPtr->FBO);
       glBindFramebuffer(GL_FRAMEBUFFER, cPtr->FBO);
@@ -60,7 +59,7 @@ namespace openApp {
 
       cPtr->width = width;
       cPtr->height = height;
-      cPtr->projection = glm::ortho(-width, width, -height, height, 0.f, 255.f);
+      cPtr->projection = glm::ortho(-width, width, -height, height, 0.f, 256.f);
       cPtr->backgroundColor = backgroundColor;
 
 
@@ -265,7 +264,7 @@ namespace openApp {
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthStencilBuffer, 0);
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-      projection = glm::ortho(-width, width, -height, height, 0.f, 255.f);
+      projection = glm::ortho(-width, width, -height, height, 0.f, 256.f);
       addGlobalCamera3D(this);
     }
 
@@ -282,7 +281,7 @@ namespace openApp {
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthStencilBuffer, 0);
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-      projection = glm::ortho(-width, width, -height, height, 0.f, 255.f);
+      projection = glm::ortho(-width, width, -height, height, 0.f, 256.f);
       addGlobalCamera3D(this);
     }
     ~Camera2D() override {

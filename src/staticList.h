@@ -208,7 +208,10 @@ namespace openApp {
     }
 
     StaticList() : internal(0), bufferSize(0), _size(0), farthest(0) {}
-    StaticList(size_t buffer) : internal(new T* [buffer] {0}), bufferSize(buffer), _size(0), farthest(0) {}
+    StaticList(size_t buffer) : bufferSize(buffer), _size(0), farthest(0) {
+      if (buffer > 0)
+        internal = new T* [buffer] {0};
+    }
 
     ~StaticList() {
       for (size_t i = 0; i < bufferSize; i++) {

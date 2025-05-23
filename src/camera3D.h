@@ -1,6 +1,5 @@
 #pragma once
 #include "texture.h"
-#include "globals.h"
 #include <vector>
 #include <algorithm>
 #include "transform3D.h"
@@ -47,8 +46,8 @@ namespace openApp {
 
 
 
-      cPtr->renderBuffer = Texture(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT);
-      cPtr->depthStencilBuffer = Texture(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+      cPtr->renderBuffer = Texture(viewportSize, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT);
+      cPtr->depthStencilBuffer = Texture(viewportSize, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
       glGenFramebuffers(1, &cPtr->FBO);
       glBindFramebuffer(GL_FRAMEBUFFER, cPtr->FBO);
@@ -239,7 +238,7 @@ namespace openApp {
       }
       if (savedRenderBuffer)
         return;
-      savedRenderBuffer = new Texture(_SCREEN_SIZE, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT);
+      savedRenderBuffer = new Texture(viewportSize, GL_LINEAR, GL_RGBA, GL_RGBA, GL_FLOAT);
 
     }
     void depthStencilBufferSaving(bool onOff) {
@@ -252,7 +251,7 @@ namespace openApp {
       }
       if (savedDepthStencilBuffer)
         return;
-      savedDepthStencilBuffer = new Texture(_SCREEN_SIZE, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+      savedDepthStencilBuffer = new Texture(viewportSize, GL_LINEAR, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
     }
 
 

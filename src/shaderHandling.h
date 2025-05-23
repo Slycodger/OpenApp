@@ -10,6 +10,7 @@
 #include <sstream>
 #include <cstring>
 #include <filesystem>
+#include "program.h"
 
 
 namespace openApp {
@@ -54,15 +55,8 @@ namespace openApp {
       return globalShaders[loc];
     }
 
-    static bool fileExists(const char* f) {
-      struct _stat buffer;
-      if (_stat(f, &buffer) == 0)
-        return true;
-      return false;
-    }
-
     static unsigned int createShader(std::string name, ShaderPair* pairs, size_t shaderCount) {
-      if (globalShaders.contains(name))
+      if (name != "" && globalShaders.contains(name))
         return globalShaders[name];
 
       if (!shaderCount || !pairs)
@@ -71,7 +65,7 @@ namespace openApp {
         if (!pairs[i].shaderCount || !pairs[i].shaders)
           return 0;
         else for (size_t j = 0; j < pairs[i].shaderCount; j++)
-          if (!pairs[i].shaders[j] || !fileExists(pairs[i].shaders[j]))
+          if (!pairs[i].shaders[j] || !program::fileExists(pairs[i].shaders[j]))
             return 0;
 
 
@@ -137,7 +131,8 @@ namespace openApp {
         glDeleteShader(shaders[i]);
       delete[](shaders);
 
-      globalShaders.insert({ name, shaderProgram });
+      if (name != "")
+        globalShaders.insert({ name, shaderProgram });
       return shaderProgram;
     }
 

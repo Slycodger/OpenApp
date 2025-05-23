@@ -12,6 +12,7 @@ namespace openApp {
   protected:
     virtual void visual3DUpdate() {}
     virtual void visual3DAddedToGlobals() {}
+    virtual void visual3DRemovedFromGlobals() {}
     virtual void visual3DSetParent(UniqueType* ptr) {}
     virtual void visual3DAddedChild(UniqueType* ptr) {}
     virtual void visual3DRemovingChild(size_t index) {}
@@ -36,8 +37,16 @@ namespace openApp {
     }
 
     void transform3DAddedToGlobals() override {
+      if (visual3DIndex >= (size_t)-1)
+        Visual3D::addGlobalVisual3DTree(this);
 
       visual3DAddedToGlobals();
+    }
+
+    void transform3DRemovedFromGlobals() override {
+      Visual3D::removeGlobalVisual3D(this);
+
+      visual3DRemovedFromGlobals();
     }
 
     void transform3DSetParent(UniqueType* ptr) override {
@@ -134,7 +143,7 @@ namespace openApp {
       if (!visual || !visual->mesh)
         return;
 
-      program::getShader3D().active();
+      glUseProgram(program::getShader3D());
       size_t camCount = Camera3D::getGlobalCamera3DCount();
       unsigned int VAO = program::getGlobalVAO();
 
@@ -170,7 +179,7 @@ namespace openApp {
 
     //--------------------------------------------------
     static void drawVisual3DInstances() {
-      program::getShader3D().active();
+      glUseProgram(program::getShader3D());
       StaticList<Camera3D*>& cams = Camera3D::globalCamera3DInstances;
       size_t camCount = Camera3D::getGlobalCamera3DCount();
       unsigned int VAO = program::getGlobalVAO();

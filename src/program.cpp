@@ -11,6 +11,7 @@
 #include "image.h"
 #include "modelLoading.h"
 #include "sound.h"
+#include "font.h"
 
 void progStart();
 void progUpdate();
@@ -38,10 +39,16 @@ float squarePoints[] = {
 unsigned int triVAO = 0, triVBO = 0;
 unsigned int squareVAO = 0, squareVBO = 0;
 
-UIVector2 _SCREEN_SIZE = { 1280, 720 };
-float _SCREEN_ASPECT = 1280.f / 720.f;
-double _DELTA_TIME = 0;
-double _APP_TIME = 0;
+//globals
+namespace openApp {
+  namespace program {
+    unsigned int SCREEN_SIZE_X = 1280;
+    unsigned int SCREEN_SIZE_Y = 720;
+    float SCREEN_ASPECT = 1280.f / 720.f;
+    double DELTA_TIME = 0;
+    double APP_TIME = 0;
+  }
+}
 
 unsigned int VAO = 0;
 unsigned int shaderMaterialUBO = 0;
@@ -134,13 +141,20 @@ Vertex2D squareVertices2D[] = {
 namespace openApp {
   namespace program {
 
+    bool fileExists(const char* f) {
+      struct _stat buffer;
+      if (_stat(f, &buffer) == 0)
+        return true;
+      return false;
+    }
+
     unsigned int getShaderMaterialUBO() {
       return shaderMaterialUBO;
     }
-    Shader getShader2D() {
+    unsigned int getShader2D() {
       return shader2D;
     }
-    Shader getShader3D() {
+    unsigned int getShader3D() {
       return shader3D;
     }
     unsigned int getGlobalVAO() {
@@ -159,7 +173,7 @@ int main() {
 
   glfwWindowHint(GLFW_RESIZABLE, false);
 
-  GLFWwindow* window = glfwCreateWindow(_SCREEN_SIZE.x, _SCREEN_SIZE.y, "OpenApp", 0, 0);
+  GLFWwindow* window = glfwCreateWindow(SCREEN_SIZE_X, SCREEN_SIZE_Y, "OpenApp", 0, 0);
   glfwMakeContextCurrent(window);
 
 
@@ -168,9 +182,9 @@ int main() {
   if (!gladLoadGL())
     return -1;
 
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_STENCIL_TEST);
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_STENCIL_TEST);
+  //glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
@@ -267,6 +281,7 @@ int main() {
 
 
 
+  //font::start();
   sound::start();
   progStart();
 
@@ -274,7 +289,7 @@ int main() {
 
   while (!glfwWindowShouldClose(window)) {
     double start = glfwGetTime();
-    _APP_TIME = glfwGetTime();
+    APP_TIME = glfwGetTime();
     glfwPollEvents();
 
     UniqueType::updateUniqueTypeInstances();
@@ -313,7 +328,7 @@ int main() {
 
     glfwSwapBuffers(window);
 
-    _DELTA_TIME = glfwGetTime() - start;
+    DELTA_TIME = glfwGetTime() - start;
   }
 
   progEnd();
@@ -325,6 +340,7 @@ int main() {
   Material::end();
   image::end();
   modelLoading::end();
+  //font::end();
   sound::end();
 
   delete(triangleMesh3D);
@@ -348,7 +364,7 @@ namespace openApp {
     void defaultView() {
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       glStencilFunc(GL_ALWAYS, 0, 0);
-      glViewport(0, 0, _SCREEN_SIZE.x, _SCREEN_SIZE.y);
+      glViewport(0, 0, SCREEN_SIZE_X, SCREEN_SIZE_Y);
     }
   }
 }

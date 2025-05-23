@@ -10,6 +10,7 @@ namespace openApp {
     virtual void copyTo(UniqueType* ptr) {}
     virtual void uniqueTypeUpdate() {}
     virtual void uniqueTypeAddedToGlobals() {}
+    virtual void uniqueTypeRemovedFromGlobals() {}
     virtual void uniqueTypeSetParent(UniqueType* ptr) {}
     virtual void uniqueTypeAddedChild(UniqueType* ptr) {}
     virtual void uniqueTypeRemovingChild(size_t index) {}
@@ -67,6 +68,10 @@ namespace openApp {
       if (c->childIndex >= (size_t)-1)
         return;
       c->parent = this;
+      if (uniqueTypeIndex < (size_t)-1)
+        UniqueType::addGlobalUniqueTypeTree(c);
+      else
+        UniqueType::removeGlobalUniqueType(c);
       c->uniqueTypeSetParent(this);
       uniqueTypeAddedChild(c);
     }
@@ -129,6 +134,9 @@ namespace openApp {
       unique->uniqueTypeIndex = -1;
       globalUniqueTypeCount--;
       globalUniqueTypeInstances.removeAt(i);
+      for (UniqueType** c : unique->children)
+        removeGlobalUniqueType(*c);
+      unique->uniqueTypeRemovedFromGlobals();
       return true;
     }
 

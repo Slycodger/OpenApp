@@ -56,6 +56,9 @@
     <ClCompile Include="src\camera2D.cpp">
       <Filter>src\project</Filter>
     </ClCompile>
+    <ClCompile Include="src\font.cpp">
+      <Filter>src\project</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dependencies">
@@ -94,9 +97,6 @@
       <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\exceptionHandling.h">
-      <Filter>src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="src\globals.h">
       <Filter>src\include</Filter>
     </ClInclude>
     <ClInclude Include="src\image.h">
@@ -162,6 +162,9 @@
     <ClInclude Include="src\vertex2D.h">
       <Filter>src\include</Filter>
     </ClInclude>
+    <ClInclude Include="src\font.h">
+      <Filter>src\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="lines.bat" />
@@ -182,6 +185,9 @@
     </None>
     <None Include="shaders\basic2DShader.vert">
       <Filter>shaders\vertex</Filter>
+    </None>
+    <None Include="shaders\charShader.frag">
+      <Filter>shaders\fragment</Filter>
     </None>
   </ItemGroup>
 </Project>

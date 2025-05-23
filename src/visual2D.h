@@ -12,6 +12,7 @@ namespace openApp {
   protected:
     virtual void visual2DUpdate() {}
     virtual void visual2DAddedToGlobals() {}
+    virtual void visual2DRemovedFromGlobals() {}
     virtual void visual2DSetParent(UniqueType* ptr) {}
     virtual void visual2DAddedChild(UniqueType* ptr) {}
     virtual void visual2DRemovingChild(size_t index) {}
@@ -36,10 +37,16 @@ namespace openApp {
     }
 
     void transform2DAddedToGlobals() override {
+      if (visual2DIndex >= (size_t)-1)
+        Visual2D::addGlobalVisual2DTree(this);
 
       visual2DAddedToGlobals();
     }
+    void transform2DRemovedFromGlobals() override {
+      Visual2D::removeGlobalVisual2D(this);
 
+      visual2DRemovedFromGlobals();
+    }
     void transform2DSetParent(UniqueType* ptr) override {
 
       visual2DSetParent(ptr);
@@ -118,6 +125,7 @@ namespace openApp {
       visual->visual2DIndex = -1;
       globalVisual2DCount--;
       globalVisual2DInstances.removeAt(i);
+
       return true;
     }
 
@@ -135,7 +143,7 @@ namespace openApp {
       if (!visual || !visual->mesh)
         return;
 
-      program::getShader2D().active();
+      glUseProgram(program::getShader2D());
       size_t camCount = Camera2D::getGlobalCamera2DCount();
       unsigned int VAO = program::getGlobalVAO();
 
@@ -143,7 +151,7 @@ namespace openApp {
       glBindBuffer(GL_UNIFORM_BUFFER, program::getShaderMaterialUBO());
 
       Shader::setMat4("transform", visual->getTransformMatrix());
-      Shader::setInt("zIndex", visual->zIndex);
+      Shader::setInt("zIndex", visual->zIndex - 255);
 
       if (visual->material)
         visual->material->applyToShader();
@@ -172,7 +180,7 @@ namespace openApp {
 
     //--------------------------------------------------
     static void drawVisual2DInstances() {
-      program::getShader2D().active();
+      glUseProgram(program::getShader2D());
       StaticList<Camera2D*>& cams = Camera2D::globalCamera2DInstances;
       size_t camCount = Camera2D::getGlobalCamera2DCount();
       unsigned int VAO = program::getGlobalVAO();
@@ -186,7 +194,7 @@ namespace openApp {
         if (!visual->mesh)
           continue;
         Shader::setMat4("transform", visual->getTransformMatrix());
-        Shader::setInt("zIndex", visual->zIndex);
+        Shader::setInt("zIndex", visual->zIndex - 255);
 
         if (visual->material)
           visual->material->applyToShader();

@@ -5,6 +5,8 @@
 #include "modelLoading.h"
 #include "sound.h"
 #include "visual2D.h"
+#include "cameraViewer.h"
+#include "font.h"
 using namespace openApp;
 
 Camera3D* camera = nullptr;
@@ -21,23 +23,22 @@ Visual3D* visual3 = nullptr;
 Material redColor = Material();
 Material imgMat = Material();
 Texture* tex;
+Texture* fT = nullptr;
+CameraViewer* camViewer;
 
 void progStart() {
-  camera = new Camera3D(80, _SCREEN_ASPECT, 0.01f, 90.f, 1, _SCREEN_SIZE, {0.2, 0.3, 0.3, 1});
-  UniqueType::addGlobalUniqueTypeTree(camera);
-  Camera3D::setMainCamera3D(camera);
+  camera = new Camera3D(80, program::SCREEN_ASPECT, 0.01f, 90.f, 1, _SCREEN_SIZE, {0.2, 0.3, 0.3, 1});
 
-  texCamera = new Camera3D(80, _SCREEN_ASPECT, 0.01f, 90.f, 1, _SCREEN_SIZE, { 0, 0, 0, 0.1 });
-  UniqueType::addGlobalUniqueTypeTree(texCamera);
+  camViewer = new CameraViewer(1);
+  UniqueType::addGlobalUniqueTypeTree(camViewer);
 
-  cam2D = new Camera2D(1, 1, 1, _SCREEN_SIZE, {0, 0, 0, 0});
+  cam2D = new Camera2D(1, 1, 1, _SCREEN_SIZE, { 0, 0, 0, 0 });
   cam2D->updateTextureFiltering(GL_NEAREST);
   UniqueType::addGlobalUniqueTypeTree(cam2D);
   Camera2D::setMainCamera2D(cam2D);
 
-  camera->position.z = 4;
-  texCamera->position.z = camera->position.z;
-  texCamera->setParent(camera);
+  camera->position.z = 9;
+  camera->setParent(camViewer);
 
 
   redColor.albedo = { 1, 0, 0, 1 };
@@ -59,6 +60,8 @@ void progStart() {
   visual2 = new Visual3D(Mesh3D::getGlobalMesh3D("triangle"), 1);
   visual3 = new Visual3D(Mesh3D::getGlobalMesh3D("cube"), 1);
 
+  visual1->srcMaterial.albedo = {1, 1, 1, 0};
+
 
   visual1->scale = {0.75f, 0.75f};
   visual12->scale = { 0.25f, 0.25f };
@@ -72,8 +75,10 @@ void progStart() {
   visual3->position = Vector3{ 0, 4.0f, -2.f };
   //visual3->setParent(visual2);
 
-  texCamera->renderBufferSaving(true);
-  visual1->srcMaterial.albedoTexture = texCamera->savedRenderBuffer;
+  //texCamera->renderBufferSaving(true);
+  //font::loadFont("./fonts/Arial.ttf", "arial");
+  //fT = font::createTextTexture("a", "arial", {1, 0, 0, 1}, {1280, 1280}, 16, 1);;
+  //visual1->srcMaterial.albedoTexture = fT;
   
   loaded = dynamic_cast<Transform3D*>(modelLoading::loadModel("./models/model.fbx"));
   if (!loaded) {
@@ -84,22 +89,29 @@ void progStart() {
   }
 
   Visual2D::addGlobalVisual2DTree(visual1);
-  Visual2D::addGlobalVisual2DTree(visual12);
+  //Visual2D::addGlobalVisual2DTree(visual12);
   Visual3D::addGlobalVisual3DTree(visual2);
   Visual3D::addGlobalVisual3DTree(visual3);
 }
 
+
 bool doom = false;
 int dings = 0;
+float angle = 0;
 
 void progUpdate() {
-  visual3->rotation.y += 30.f * _DELTA_TIME;
-  visual3->rotation.x += 15.f * _DELTA_TIME;
+  visual3->rotation.y += 30.f * program::DELTA_TIME;
+  visual3->rotation.x += 15.f * program::DELTA_TIME;
 
-  if (_APP_TIME > 2.0f) {
-    loaded->rotation.x += 45.f * _DELTA_TIME;
+  camera->position.x = 9 * sin(angle * _degToRadF);
+  camera->position.z = 9 * cos(angle * _degToRadF);
+  camera->rotation.y = -angle;
+
+  if (program::APP_TIME > 2.0f) {
+    angle += 25.f * program::DELTA_TIME;
+    loaded->rotation.x += 45.f * program::DELTA_TIME;
     UIVector2 s = cam2D->getSize();
-    if (s.x > 100)
+    if (s.x > 300)
       cam2D->resize(s * 0.99f, true);
     if (dings < 250) {
       sound::queueSound("./sounds/ding.wav");
@@ -121,4 +133,5 @@ void progEnd() {
   delete(visual2);
   delete(visual3);
   delete(visual12);
+  delete(fT);
 }

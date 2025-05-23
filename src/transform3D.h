@@ -12,6 +12,7 @@ namespace openApp {
     virtual void transform3DCopyTo(UniqueType* ptr) {}
     virtual void transform3DUpdate() {}
     virtual void transform3DAddedToGlobals() {}
+    virtual void transform3DRemovedFromGlobals() {}
     virtual void transform3DSetParent(UniqueType* ptr) {}
     virtual void transform3DAddedChild(UniqueType* ptr) {}
     virtual void transform3DRemovingChild(size_t index) {}
@@ -52,7 +53,10 @@ namespace openApp {
     void uniqueTypeAddedToGlobals() override {
       transform3DAddedToGlobals();
     }
+    void uniqueTypeRemovedFromGlobals() override {
 
+      transform3DRemovedFromGlobals();
+    }
 
     void copyTo(UniqueType* ptr) override {
       Transform3D* tPtr = dynamic_cast<Transform3D*>(ptr);

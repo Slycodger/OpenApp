@@ -12,6 +12,7 @@ namespace openApp {
     virtual void transform2DCopyTo(UniqueType* ptr) {}
     virtual void transform2DUpdate() {}
     virtual void transform2DAddedToGlobals() {}
+    virtual void transform2DRemovedFromGlobals() {}
     virtual void transform2DSetParent(UniqueType* ptr) {}
     virtual void transform2DAddedChild(UniqueType* ptr) {}
     virtual void transform2DRemovingChild(size_t index) {}
@@ -50,7 +51,12 @@ namespace openApp {
       transform2DUpdate();
     }
     void uniqueTypeAddedToGlobals() override {
-      transform2DAddedToGlobals();
+
+       transform2DAddedToGlobals();
+    }
+    void uniqueTypeRemovedFromGlobals() override {
+
+      transform2DRemovedFromGlobals();
     }
 
 
@@ -79,9 +85,9 @@ namespace openApp {
 
     virtual glm::mat4 getTransformMatrix() {
       glm::mat4 mat(1);
-      mat = glm::translate(mat, glm::vec3(position.x, position.y, 0));
-      mat = glm::rotate(mat, rotation * _degToRadF, glm::vec3(0, 0, 1));
-      mat = glm::scale(mat, glm::vec3(scale.x, scale.y, 1));
+     // mat = glm::translate(mat, glm::vec3(position.x, position.y, 0));
+     // mat = glm::rotate(mat, rotation * _degToRadF, glm::vec3(0, 0, 1));
+      //mat = glm::scale(mat, glm::vec3(scale.x, scale.y, 1));
       return mat;
     }
 
