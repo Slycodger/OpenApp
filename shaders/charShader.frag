@@ -6,7 +6,11 @@ in vec2 fragUV;
 
 uniform sampler2D charTexture;
 uniform vec4 color;
+uniform float cutoff;
 
 void main() {
-  fragColor = color * texture(charTexture, fragUV).x;
+  if (texture(charTexture, fragUV).x > cutoff)
+    fragColor = color;
+  else
+    fragColor = vec4(0);
 }

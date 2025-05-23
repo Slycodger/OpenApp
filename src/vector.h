@@ -57,6 +57,59 @@ namespace openApp {
     int y;
 
 
+    IVector2 operator - (const IVector2& vec) const {
+      IVector2 t = *this;
+      t.x -= vec.x;
+      t.y -= vec.y;
+      return t;
+    }
+    IVector2 operator + (const IVector2& vec) const {
+      IVector2 t = *this;
+      t.x += vec.x;
+      t.y += vec.y;
+      return t;
+    }
+    IVector2 operator / (const IVector2& vec) const {
+      IVector2 t = *this;
+      t.x /= vec.x;
+      t.y /= vec.y;
+      return t;
+    }
+    IVector2 operator * (const IVector2& vec) const {
+      IVector2 t = *this;
+      t.x *= vec.x;
+      t.y *= vec.y;
+      return t;
+    }
+    IVector2 operator * (const float& vec) const {
+      IVector2 t = *this;
+      t.x *= vec;
+      t.y *= vec;
+      return t;
+    }
+
+    IVector2& operator += (const IVector2& vec) {
+      x += vec.x;
+      y += vec.y;
+      return *this;
+    }
+
+    IVector2& operator /= (const IVector2& vec) {
+      x /= vec.x;
+      y /= vec.y;
+      return *this;
+    }
+    IVector2& operator += (const float val) {
+      x += val;
+      y += val;
+      return *this;
+    }
+    IVector2& operator *= (const float val) {
+      x *= val;
+      y *= val;
+      return *this;
+    }
+
     IVector2() : x(0), y(0) {}
     IVector2(int t) : x(t), y(t) {}
     IVector2(int a, int b) : x(a), y(b) {}

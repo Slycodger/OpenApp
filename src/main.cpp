@@ -25,6 +25,7 @@ Material imgMat = Material();
 Texture* tex;
 Texture* fT = nullptr;
 CameraViewer* camViewer;
+Font* fo = nullptr;
 
 void progStart() {
   camera = new Camera3D(80, program::SCREEN_ASPECT, 0.01f, 90.f, 1, _SCREEN_SIZE, {0.2, 0.3, 0.3, 1});
@@ -63,7 +64,7 @@ void progStart() {
   visual1->srcMaterial.albedo = {1, 1, 1, 0};
 
 
-  visual1->scale = {0.75f, 0.75f};
+  visual1->scale = {1, 1};
   visual12->scale = { 0.25f, 0.25f };
   visual12->material = Material::getGlobalMaterial("redColor");
   visual12->position = {-0.5f, 0.25f};
@@ -76,9 +77,10 @@ void progStart() {
   //visual3->setParent(visual2);
 
   //texCamera->renderBufferSaving(true);
-  //font::loadFont("./fonts/Arial.ttf", "arial");
-  //fT = font::createTextTexture("a", "arial", {1, 0, 0, 1}, {1280, 1280}, 16, 1);;
-  //visual1->srcMaterial.albedoTexture = fT;
+  fo = font::loadFont("./fonts/Arial.ttf", "arial");
+  fo->setFontSize(12);
+  fT = font::createTextTexture("|hello,\n World jjjjjjjjjjjjjjjjjjaeeeeeeeefhhhhhhhhhhhhhhhhhkkkkkkkkkkkkkkkkkkkkkkkk", fo, {1, 1, 0, 1}, 1080, 1, 128, 1.2, true, 0.25);
+  visual1->srcMaterial.albedoTexture = fT;
   
   loaded = dynamic_cast<Transform3D*>(modelLoading::loadModel("./models/model.fbx"));
   if (!loaded) {
@@ -89,7 +91,7 @@ void progStart() {
   }
 
   Visual2D::addGlobalVisual2DTree(visual1);
-  //Visual2D::addGlobalVisual2DTree(visual12);
+  Visual2D::addGlobalVisual2DTree(visual12);
   Visual3D::addGlobalVisual3DTree(visual2);
   Visual3D::addGlobalVisual3DTree(visual3);
 }
@@ -111,8 +113,18 @@ void progUpdate() {
     angle += 25.f * program::DELTA_TIME;
     loaded->rotation.x += 45.f * program::DELTA_TIME;
     UIVector2 s = cam2D->getSize();
+    unsigned int fS = fo->getFontSize();
     if (s.x > 300)
       cam2D->resize(s * 0.99f, true);
+
+    if (fS < 128) {
+      fS++;
+      delete(fT);
+      fo->setFontSize(fS);
+      fT = font::createTextTexture("|hello,\n World jjjjjjjjjjjjjjjjjjaeeeeeeeefhhhhhhhhhhhhhhhhhkkkkkkkkkkkkkkkkkkkkkkkk", fo, {1, 1, 0, 1}, 1080, 1, 128, 1.2, true, 0.25);
+      visual1->srcMaterial.albedoTexture = fT;
+    }
+
     if (dings < 250) {
       sound::queueSound("./sounds/ding.wav");
       dings++;
@@ -120,6 +132,7 @@ void progUpdate() {
     if (!doom) {
       sound::playMusic("./sounds/doom.mp3");
       doom = true;
+
     }
   }
 }

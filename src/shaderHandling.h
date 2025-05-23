@@ -41,12 +41,23 @@ namespace openApp {
     operator int() {
       return internal;
     }
+    ~Shader() {
+      glDeleteTextures(1, &internal);
+    }
 
 
 
 
     static std::map<std::string, unsigned int> globalShaders;
 
+
+    static unsigned int getCurrentShader() {
+      return currentShader;
+    }
+    static void setCurrentShader(unsigned int s) {
+      glUseProgram(s);
+      currentShader = s;
+    }
 
     static unsigned int getShader(std::string loc) {
       if (!globalShaders.contains(loc))
@@ -209,11 +220,6 @@ namespace openApp {
     }
     static void setMat4(const char* name, const float* Mat) {
       glUniformMatrix4fv(glGetUniformLocation(currentShader, name), 1, false, Mat);
-    }
-
-
-    static unsigned int getCurrentShader() {
-      return currentShader;
     }
   };
 }

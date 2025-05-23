@@ -182,9 +182,9 @@ int main() {
   if (!gladLoadGL())
     return -1;
 
-  //glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_STENCIL_TEST);
-  //glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
   glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
@@ -281,7 +281,7 @@ int main() {
 
 
 
-  //font::start();
+  font::start();
   sound::start();
   progStart();
 
@@ -340,7 +340,7 @@ int main() {
   Material::end();
   image::end();
   modelLoading::end();
-  //font::end();
+  font::end();
   sound::end();
 
   delete(triangleMesh3D);

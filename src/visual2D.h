@@ -180,7 +180,7 @@ namespace openApp {
 
     //--------------------------------------------------
     static void drawVisual2DInstances() {
-      glUseProgram(program::getShader2D());
+      Shader::setCurrentShader(program::getShader2D());
       StaticList<Camera2D*>& cams = Camera2D::globalCamera2DInstances;
       size_t camCount = Camera2D::getGlobalCamera2DCount();
       unsigned int VAO = program::getGlobalVAO();
@@ -193,8 +193,8 @@ namespace openApp {
         Visual2D* visual = *vP;
         if (!visual->mesh)
           continue;
-        Shader::setMat4("transform", visual->getTransformMatrix());
         Shader::setInt("zIndex", visual->zIndex - 255);
+        Shader::setMat4("transform", visual->getTransformMatrix());
 
         if (visual->material)
           visual->material->applyToShader();

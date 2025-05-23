@@ -179,7 +179,7 @@ namespace openApp {
 
     //--------------------------------------------------
     static void drawVisual3DInstances() {
-      glUseProgram(program::getShader3D());
+      Shader::setCurrentShader(program::getShader3D());
       StaticList<Camera3D*>& cams = Camera3D::globalCamera3DInstances;
       size_t camCount = Camera3D::getGlobalCamera3DCount();
       unsigned int VAO = program::getGlobalVAO();
